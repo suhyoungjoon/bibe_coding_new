@@ -17,7 +17,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from enum import Enum
-import docker
+# import docker  # Railway 환경에서는 Docker 사용 불가
 import uuid
 
 logger = logging.getLogger(__name__)
@@ -72,14 +72,10 @@ class EnhancedSandboxService:
         self._init_docker()
     
     def _init_docker(self):
-        """Docker 클라이언트 초기화"""
-        try:
-            self.docker_client = docker.from_env()
-            self.docker_client.ping()
-            logger.info("Docker 클라이언트 초기화 성공")
-        except Exception as e:
-            logger.warning(f"Docker 클라이언트 초기화 실패: {e}")
-            self.docker_client = None
+        """Docker 클라이언트 초기화 (Railway 환경에서는 비활성화)"""
+        # Railway 환경에서는 Docker 사용 불가
+        self.docker_client = None
+        logger.info("Railway 환경: Docker 사용 불가, 로컬 실행 모드로 설정")
     
     def _init_security_policies(self) -> Dict[str, Dict[str, Any]]:
         """보안 정책 초기화"""
@@ -302,7 +298,7 @@ class EnhancedSandboxService:
             
             # 코드 실행
             if execution_mode == ExecutionMode.DOCKER and self.docker_client:
-                result = await self._execute_in_docker_enhanced(
+                # result = await self._execute_in_docker_enhanced(
                     code, language, user_id, execution_id, resource_limits
                 )
             else:
@@ -338,7 +334,7 @@ class EnhancedSandboxService:
                 metadata={"execution_id": execution_id, "error_type": "execution_error"}
             )
     
-    async def _execute_in_docker_enhanced(
+    # async def _execute_in_docker_enhanced(
         self, 
         code: str, 
         language: str, 
