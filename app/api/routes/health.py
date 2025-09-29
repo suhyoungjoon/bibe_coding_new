@@ -81,13 +81,62 @@ async def health_check():
 
 @router.get("/health/simple")
 async def simple_health_check():
-    """간단한 헬스 체크 (Railway용)"""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "version": "2.0.0",
-        "message": "Agentic AI API Server is running"
-    }
+    """간단한 헬스 체크 (Railway용) - 디버그 정보 포함"""
+    try:
+        # 시스템 정보 수집
+        import os
+        import sys
+        import platform
+        
+        debug_info = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "version": "2.0.0",
+            "message": "Agentic AI API Server is running",
+            "environment": {
+                "python_version": sys.version,
+                "platform": platform.platform(),
+                "railway_env": os.getenv('RAILWAY_ENVIRONMENT', 'None'),
+                "port": os.getenv('PORT', '8000'),
+                "host": os.getenv('HOST', '0.0.0.0')
+            },
+            "modules": {
+                "fastapi_available": True,
+                "vectorstore_available": False,
+                "live_coding_available": False,
+                "enhanced_sandbox_available": False
+            }
+        }
+        
+        # 모듈 가용성 테스트
+        try:
+            from app.vectorstore.faiss_store import FaissStore
+            debug_info["modules"]["vectorstore_available"] = True
+        except Exception as e:
+            debug_info["modules"]["vectorstore_error"] = str(e)
+        
+        try:
+            from app.services.live_coding_service import LiveCodingService
+            debug_info["modules"]["live_coding_available"] = True
+        except Exception as e:
+            debug_info["modules"]["live_coding_error"] = str(e)
+        
+        try:
+            from app.services.enhanced_sandbox_service import EnhancedSandboxService
+            debug_info["modules"]["enhanced_sandbox_available"] = True
+        except Exception as e:
+            debug_info["modules"]["enhanced_sandbox_error"] = str(e)
+        
+        return debug_info
+        
+    except Exception as e:
+        logger.error(f"헬스체크 중 오류: {e}")
+        return {
+            "status": "error",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "message": "Health check failed"
+        }
 
 @router.get("/health/detailed")
 async def detailed_health_check():

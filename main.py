@@ -9,23 +9,74 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from contextlib import asynccontextmanager
 import logging
+import os
 
-from app.api.routes import query, documents, index, health, websocket, improved_demo, ui_enhancements, sandbox, enhanced_sandbox_demo
+from app.api.routes import query, documents, index, health, websocket, improved_demo, ui_enhancements, sandbox, enhanced_sandbox_demo, debug
 from app.core.config import settings
 from app.core.exceptions import AgenticAIException
 
-# 로깅 설정
-logging.basicConfig(level=logging.INFO)
+# 로깅 설정 (Railway 디버깅용)
+logging.basicConfig(
+    level=logging.DEBUG,  # DEBUG 레벨로 변경
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # 콘솔 출력
+        logging.FileHandler('app.log')  # 파일 로그
+    ]
+)
 logger = logging.getLogger(__name__)
+
+# Railway 환경 감지
+RAILWAY_ENV = os.getenv('RAILWAY_ENVIRONMENT')
+if RAILWAY_ENV:
+    logger.info(f"🚀 Railway 환경 감지: {RAILWAY_ENV}")
+    logger.info(f"📍 PORT: {os.getenv('PORT', '8000')}")
+    logger.info(f"📍 HOST: {os.getenv('HOST', '0.0.0.0')}")
+else:
+    logger.info("🏠 로컬 환경에서 실행 중")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """애플리케이션 생명주기 관리"""
-    # 시작 시 실행
+    """애플리케이션 생명주기 관리 (Railway 디버깅 강화)"""
+    # 시작 시 실행 - 상세 디버그 정보
     logger.info("🚀 Agentic AI FastAPI 서버 시작")
     logger.info(f"📁 데이터 디렉토리: {settings.DATA_DIR}")
     logger.info(f"📁 인덱스 디렉토리: {settings.INDEX_DIR}")
     logger.info(f"🤖 LLM 프로바이더: {settings.LLM_PROVIDER}")
+    
+    # Railway 환경 변수 디버깅
+    logger.info("🔍 환경 변수 디버깅:")
+    logger.info(f"  - PORT: {os.getenv('PORT', '8000')}")
+    logger.info(f"  - HOST: {os.getenv('HOST', '0.0.0.0')}")
+    logger.info(f"  - RAILWAY_ENVIRONMENT: {os.getenv('RAILWAY_ENVIRONMENT', 'None')}")
+    logger.info(f"  - NODE_ENV: {os.getenv('NODE_ENV', 'None')}")
+    
+    # 디렉토리 존재 확인
+    try:
+        logger.info("📂 디렉토리 존재 확인:")
+        logger.info(f"  - DATA_DIR 존재: {settings.DATA_DIR.exists()}")
+        logger.info(f"  - INDEX_DIR 존재: {settings.INDEX_DIR.exists()}")
+        if settings.DATA_DIR.exists():
+            logger.info(f"  - DATA_DIR 내용: {list(settings.DATA_DIR.iterdir())}")
+    except Exception as e:
+        logger.error(f"❌ 디렉토리 확인 실패: {e}")
+    
+    # 모듈 import 테스트
+    try:
+        logger.info("🧩 핵심 모듈 import 테스트:")
+        from app.vectorstore.faiss_store import FaissStore
+        logger.info("  ✅ FaissStore import 성공")
+        
+        from app.services.live_coding_service import LiveCodingService
+        logger.info("  ✅ LiveCodingService import 성공")
+        
+        from app.services.enhanced_sandbox_service import EnhancedSandboxService
+        logger.info("  ✅ EnhancedSandboxService import 성공")
+        
+    except Exception as e:
+        logger.error(f"❌ 모듈 import 실패: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
     
     yield
     
@@ -87,6 +138,7 @@ app.include_router(improved_demo.router, prefix="/api/v1", tags=["demo"])
 app.include_router(ui_enhancements.router, prefix="/api/v1", tags=["ui"])
 app.include_router(sandbox.router, prefix="/api/v1/sandbox", tags=["sandbox"])
 app.include_router(enhanced_sandbox_demo.router, prefix="/api/v1", tags=["demo"])
+app.include_router(debug.router, prefix="/api/v1", tags=["debug"])  # Railway 디버깅용
 
 # 루트 엔드포인트
 @app.get("/")

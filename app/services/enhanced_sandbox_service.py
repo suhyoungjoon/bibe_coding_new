@@ -1,48 +1,37 @@
 """
-향상된 샌드박스 서비스
-보안, 모니터링, 리소스 관리 기능이 강화된 코드 실행 환경
+Enhanced Sandbox Service (Railway 환경 최적화)
+Railway 환경에서 안전하고 간단한 코드 실행 서비스
 """
 
 import os
 import tempfile
 import subprocess
-import shutil
 import logging
-import asyncio
-import json
-import psutil
-import time
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import dataclass, asdict
 from enum import Enum
-# import docker  # Railway 환경에서는 Docker 사용 불가
 import uuid
 
 logger = logging.getLogger(__name__)
 
 class ExecutionMode(Enum):
     """실행 모드"""
-    DOCKER = "docker"
     LOCAL = "local"
-    AUTO = "auto"
 
 class SecurityLevel(Enum):
-    """보안 수준"""
-    LOW = "low"          # 기본 제한
-    MEDIUM = "medium"    # 중간 제한
-    HIGH = "high"        # 높은 제한
-    MAXIMUM = "maximum"  # 최대 제한
+    """보안 레벨"""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 @dataclass
 class ResourceLimits:
-    """리소스 제한 설정"""
-    memory_mb: int = 128
-    cpu_percent: float = 50.0
-    execution_timeout: int = 30
-    max_file_size_mb: int = 10
-    max_files: int = 100
+    """리소스 제한"""
+    max_memory_mb: int = 128
+    max_cpu_percent: float = 50.0
+    timeout_seconds: int = 30
 
 @dataclass
 class ExecutionResult:
@@ -53,60 +42,36 @@ class ExecutionResult:
     execution_time: float
     memory_usage_mb: float
     cpu_usage_percent: float
-    language: str
     method: str
-    security_level: str
-    resource_limits: Dict[str, Any]
-    metadata: Dict[str, Any]
 
 class EnhancedSandboxService:
-    """향상된 샌드박스 서비스"""
+    """Railway 환경 최적화 샌드박스 서비스"""
     
     def __init__(self):
         self.temp_dirs = {}  # 사용자별 임시 디렉토리
-        self.docker_client = None
         self.execution_history = {}  # 실행 히스토리
         self.resource_monitor = {}   # 리소스 모니터링
         self.security_policies = self._init_security_policies()
         self.language_configs = self._init_language_configs()
-        self._init_docker()
-    
-    def _init_docker(self):
-        """Docker 클라이언트 초기화 (Railway 환경에서는 비활성화)"""
-        # Railway 환경에서는 Docker 사용 불가
-        self.docker_client = None
-        logger.info("Railway 환경: Docker 사용 불가, 로컬 실행 모드로 설정")
+        logger.info("EnhancedSandboxService 초기화 완료 (Railway 환경 최적화)")
     
     def _init_security_policies(self) -> Dict[str, Dict[str, Any]]:
         """보안 정책 초기화"""
         return {
             SecurityLevel.LOW.value: {
-                "forbidden_imports": ["os", "subprocess", "sys", "shutil"],
-                "forbidden_functions": ["eval", "exec", "compile", "input"],
-                "network_access": True,
-                "file_access": True,
-                "resource_limits": ResourceLimits(memory_mb=256, cpu_percent=75.0)
+                "allowed_modules": ["os", "sys", "datetime", "math", "random"],
+                "max_execution_time": 30,
+                "max_memory_mb": 128
             },
             SecurityLevel.MEDIUM.value: {
-                "forbidden_imports": ["os", "subprocess", "sys", "shutil", "socket", "urllib"],
-                "forbidden_functions": ["eval", "exec", "compile", "input", "open"],
-                "network_access": False,
-                "file_access": False,
-                "resource_limits": ResourceLimits(memory_mb=128, cpu_percent=50.0)
+                "allowed_modules": ["os", "sys", "datetime", "math", "random", "json"],
+                "max_execution_time": 20,
+                "max_memory_mb": 64
             },
             SecurityLevel.HIGH.value: {
-                "forbidden_imports": ["os", "subprocess", "sys", "shutil", "socket", "urllib", "requests", "http"],
-                "forbidden_functions": ["eval", "exec", "compile", "input", "open", "file", "raw_input"],
-                "network_access": False,
-                "file_access": False,
-                "resource_limits": ResourceLimits(memory_mb=64, cpu_percent=25.0)
-            },
-            SecurityLevel.MAXIMUM.value: {
-                "forbidden_imports": ["os", "subprocess", "sys", "shutil", "socket", "urllib", "requests", "http", "ftplib", "smtplib"],
-                "forbidden_functions": ["eval", "exec", "compile", "input", "open", "file", "raw_input", "__import__"],
-                "network_access": False,
-                "file_access": False,
-                "resource_limits": ResourceLimits(memory_mb=32, cpu_percent=10.0)
+                "allowed_modules": ["math", "random", "datetime"],
+                "max_execution_time": 10,
+                "max_memory_mb": 32
             }
         }
     
@@ -114,69 +79,24 @@ class EnhancedSandboxService:
         """언어별 설정 초기화"""
         return {
             "python": {
-                "name": "Python",
-                "version": "3.11",
+                "command": ["python3", "-c"],
                 "extension": ".py",
-                "docker_image": "python:3.11-slim",
-                "docker_command": ["python", "/tmp/code.py"],
-                "local_command": ["python3", "{file}"],
-                "fallback_command": ["python", "{file}"]
+                "supported": True
             },
             "javascript": {
-                "name": "JavaScript (Node.js)",
-                "version": "18",
-                "extension": ".js",
-                "docker_image": "node:18-slim",
-                "docker_command": ["node", "/tmp/code.js"],
-                "local_command": ["node", "{file}"]
+                "command": ["node", "-e"],
+                "extension": ".js", 
+                "supported": True
             },
             "java": {
-                "name": "Java",
-                "version": "11",
+                "command": ["java", "-version"],
                 "extension": ".java",
-                "docker_image": "openjdk:11-jdk-slim",
-                "docker_command": ["sh", "-c", "cd /tmp && javac code.java && java -cp /tmp Main"],
-                "local_command": ["javac", "{file}", "&&", "java", "{class}"]
+                "supported": False  # Railway에서는 지원하지 않음
             },
             "go": {
-                "name": "Go",
-                "version": "1.21",
+                "command": ["go", "version"],
                 "extension": ".go",
-                "docker_image": "golang:1.21-alpine",
-                "docker_command": ["sh", "-c", "cd /tmp && go run code.go"],
-                "local_command": ["go", "run", "{file}"]
-            },
-            "rust": {
-                "name": "Rust",
-                "version": "1.75",
-                "extension": ".rs",
-                "docker_image": "rust:1.75-slim",
-                "docker_command": ["sh", "-c", "cd /tmp && rustc code.rs && ./code"],
-                "local_command": ["rustc", "{file}", "&&", "./{executable}"]
-            },
-            "cpp": {
-                "name": "C++",
-                "version": "17",
-                "extension": ".cpp",
-                "docker_image": "gcc:latest",
-                "docker_command": ["sh", "-c", "cd /tmp && g++ -std=c++17 code.cpp -o code && ./code"],
-                "local_command": ["g++", "-std=c++17", "{file}", "-o", "{executable}", "&&", "./{executable}"]
-            },
-            "csharp": {
-                "name": "C#",
-                "version": "8.0",
-                "extension": ".cs",
-                "docker_image": "mcr.microsoft.com/dotnet/sdk:8.0",
-                "docker_command": ["sh", "-c", "cd /tmp && dotnet new console --force && mv code.cs Program.cs && dotnet run"],
-                "local_command": ["dotnet", "run"]
-            },
-            "php": {
-                "name": "PHP",
-                "version": "8.2",
-                "extension": ".php",
-                "docker_image": "php:8.2-cli",
-                "docker_command": ["php", "/tmp/code.php"],
-                "local_command": ["php", "{file}"]
+                "supported": False  # Railway에서는 지원하지 않음
             }
         }
     
@@ -188,73 +108,140 @@ class EnhancedSandboxService:
             logger.info(f"사용자 {user_id} 임시 디렉토리 생성: {temp_dir}")
         return self.temp_dirs[user_id]
     
-    def _validate_code_security(self, code: str, language: str, security_level: SecurityLevel) -> Tuple[bool, str]:
+    def _validate_code_security(self, code: str, language: str, security_level: SecurityLevel) -> tuple[bool, str]:
         """코드 보안 검증"""
-        policy = self.security_policies[security_level.value]
+        # Railway 환경에서는 간단한 검증만 수행
+        dangerous_patterns = [
+            "import os", "import sys", "import subprocess", 
+            "import shutil", "__import__", "eval(", "exec("
+        ]
         
-        # 금지된 import 검사
-        for forbidden_import in policy["forbidden_imports"]:
-            if f"import {forbidden_import}" in code or f"from {forbidden_import}" in code:
-                return False, f"금지된 모듈 사용: {forbidden_import}"
-        
-        # 금지된 함수 검사
-        for forbidden_func in policy["forbidden_functions"]:
-            if f"{forbidden_func}(" in code:
-                return False, f"금지된 함수 사용: {forbidden_func}"
-        
-        # 언어별 추가 검사
-        if language == "python":
-            # 위험한 패턴 검사
-            dangerous_patterns = [
-                "__import__",
-                "getattr",
-                "setattr",
-                "delattr",
-                "globals()",
-                "locals()",
-                "vars()",
-                "dir()"
-            ]
-            for pattern in dangerous_patterns:
-                if pattern in code:
-                    return False, f"위험한 패턴 감지: {pattern}"
+        for pattern in dangerous_patterns:
+            if pattern in code.lower():
+                return False, f"위험한 패턴 감지: {pattern}"
         
         return True, "보안 검증 통과"
     
-    def _monitor_resource_usage(self, process_id: str, user_id: str) -> Dict[str, float]:
-        """리소스 사용량 모니터링"""
-        try:
-            process = psutil.Process(process_id)
-            memory_info = process.memory_info()
-            cpu_percent = process.cpu_percent()
-            
-            return {
-                "memory_mb": memory_info.rss / 1024 / 1024,
-                "cpu_percent": cpu_percent,
-                "timestamp": datetime.now().isoformat()
-            }
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            return {"memory_mb": 0, "cpu_percent": 0, "timestamp": datetime.now().isoformat()}
-    
     async def execute_code_enhanced(
-        self, 
-        code: str, 
-        language: str = "python", 
+        self,
+        code: str,
+        language: str = "python",
         user_id: str = "default",
-        execution_mode: ExecutionMode = ExecutionMode.AUTO,
         security_level: SecurityLevel = SecurityLevel.MEDIUM,
+        execution_mode: ExecutionMode = ExecutionMode.LOCAL,
         custom_resource_limits: Optional[ResourceLimits] = None
     ) -> ExecutionResult:
-        """향상된 코드 실행"""
+        """Railway 환경 최적화 코드 실행"""
+        logger.info(f"코드 실행 시작 - 언어: {language}, 사용자: {user_id}, 보안레벨: {security_level.value}")
         
+        # 언어 지원 확인
+        if language not in self.language_configs:
+            return ExecutionResult(
+                success=False,
+                output="",
+                error=f"지원하지 않는 언어: {language}",
+                execution_time=0,
+                memory_usage_mb=0,
+                cpu_usage_percent=0,
+                method="validation_failed"
+            )
+        
+        config = self.language_configs[language]
+        if not config.get("supported", False):
+            return ExecutionResult(
+                success=False,
+                output="",
+                error=f"Railway 환경에서는 {language} 실행이 지원되지 않습니다. Python 또는 JavaScript만 지원됩니다.",
+                execution_time=0,
+                memory_usage_mb=0,
+                cpu_usage_percent=0,
+                method="language_not_supported"
+            )
+        
+        # 보안 검증
+        is_safe, security_message = self._validate_code_security(code, language, security_level)
+        if not is_safe:
+            return ExecutionResult(
+                success=False,
+                output="",
+                error=f"보안 검증 실패: {security_message}",
+                execution_time=0,
+                memory_usage_mb=0,
+                cpu_usage_percent=0,
+                method="security_failed"
+            )
+        
+        # 실행 ID 생성
         execution_id = str(uuid.uuid4())
-        start_time = time.time()
-        
-        logger.info(f"향상된 코드 실행 시작 - ID: {execution_id}, 언어: {language}, 사용자: {user_id}")
         
         try:
-            # 언어 지원 확인
-            if language not in self.language_configs:
+            # Railway 환경에서는 항상 로컬 실행
+            result = await self._execute_locally_enhanced(
+                code, language, user_id, execution_id, 
+                custom_resource_limits or ResourceLimits()
+            )
+            
+            # 실행 히스토리 저장
+            self.execution_history[execution_id] = {
+                "user_id": user_id,
+                "language": language,
+                "security_level": security_level.value,
+                "success": result.success,
+                "execution_time": result.execution_time,
+                "timestamp": datetime.now().isoformat(),
+                "method": result.method
+            }
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"코드 실행 중 오류 발생: {e}", exc_info=True)
+            return ExecutionResult(
+                success=False,
+                output="",
+                error=f"실행 오류: {str(e)}",
+                execution_time=0,
+                memory_usage_mb=0,
+                cpu_usage_percent=0,
+                method="error"
+            )
+    
+    async def _execute_locally_enhanced(
+        self,
+        code: str,
+        language: str,
+        user_id: str,
+        execution_id: str,
+        resource_limits: ResourceLimits
+    ) -> ExecutionResult:
+        """로컬에서 향상된 코드 실행 (Railway 최적화)"""
+        start_time = datetime.now()
+        config = self.language_configs[language]
+        
+        try:
+            # 사용자별 임시 디렉토리에서 작업
+            temp_dir = self._get_user_temp_dir(user_id)
+            
+            # 코드 실행
+            if language == "python":
+                # Python 코드 직접 실행
+                result = subprocess.run(
+                    ["python3", "-c", code],
+                    capture_output=True,
+                    text=True,
+                    timeout=resource_limits.timeout_seconds,
+                    cwd=temp_dir
+                )
+            elif language == "javascript":
+                # JavaScript 코드 직접 실행
+                result = subprocess.run(
+                    ["node", "-e", code],
+                    capture_output=True,
+                    text=True,
+                    timeout=resource_limits.timeout_seconds,
+                    cwd=temp_dir
+                )
+            else:
                 return ExecutionResult(
                     success=False,
                     output="",
@@ -262,288 +249,86 @@ class EnhancedSandboxService:
                     execution_time=0,
                     memory_usage_mb=0,
                     cpu_usage_percent=0,
-                    language=language,
-                    method="validation",
-                    security_level=security_level.value,
-                    resource_limits={},
-                    metadata={"execution_id": execution_id, "error_type": "unsupported_language"}
+                    method="language_not_supported"
                 )
             
-            # 보안 검증
-            is_secure, security_message = self._validate_code_security(code, language, security_level)
-            if not is_secure:
+            end_time = datetime.now()
+            execution_time = (end_time - start_time).total_seconds()
+            
+            # 결과 반환
+            if result.returncode == 0:
+                return ExecutionResult(
+                    success=True,
+                    output=result.stdout,
+                    error=result.stderr if result.stderr else "",
+                    execution_time=execution_time,
+                    memory_usage_mb=0,  # Railway에서는 정확한 메모리 측정 어려움
+                    cpu_usage_percent=0,  # Railway에서는 정확한 CPU 측정 어려움
+                    method="local"
+                )
+            else:
                 return ExecutionResult(
                     success=False,
-                    output="",
-                    error=f"보안 검증 실패: {security_message}",
-                    execution_time=time.time() - start_time,
+                    output=result.stdout,
+                    error=result.stderr if result.stderr else f"실행 실패 (종료 코드: {result.returncode})",
+                    execution_time=execution_time,
                     memory_usage_mb=0,
                     cpu_usage_percent=0,
-                    language=language,
-                    method="security_check",
-                    security_level=security_level.value,
-                    resource_limits={},
-                    metadata={"execution_id": execution_id, "error_type": "security_violation"}
+                    method="local"
                 )
-            
-            # 리소스 제한 설정
-            resource_limits = custom_resource_limits or self.security_policies[security_level.value]["resource_limits"]
-            
-            # 실행 모드 결정
-            if execution_mode == ExecutionMode.AUTO:
-                if self.docker_client:
-                    execution_mode = ExecutionMode.DOCKER
-                else:
-                    execution_mode = ExecutionMode.LOCAL
-            
-            # 코드 실행 (Railway 환경에서는 항상 로컬 실행)
-            result = await self._execute_locally_enhanced(
-                code, language, user_id, execution_id, resource_limits
-            )
-            
-            # 실행 히스토리 저장
-            self.execution_history[execution_id] = {
-                "user_id": user_id,
-                "language": language,
-                "execution_mode": execution_mode.value,
-                "security_level": security_level.value,
-                "timestamp": datetime.now().isoformat(),
-                "result": asdict(result)
-            }
-            
-            return result
-            
-        except Exception as e:
-            logger.error(f"코드 실행 실패: {e}", exc_info=True)
+                
+        except subprocess.TimeoutExpired:
             return ExecutionResult(
                 success=False,
                 output="",
-                error=str(e),
-                execution_time=time.time() - start_time,
+                error=f"코드 실행 시간 초과 ({resource_limits.timeout_seconds}초)",
+                execution_time=resource_limits.timeout_seconds,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                language=language,
-                method="error",
-                security_level=security_level.value,
-                resource_limits=asdict(resource_limits) if custom_resource_limits else {},
-                metadata={"execution_id": execution_id, "error_type": "execution_error"}
+                method="timeout"
             )
-    
-    async def _execute_locally_enhanced(
-        self, 
-        code: str, 
-        language: str, 
-        user_id: str, 
-        execution_id: str,
-        resource_limits: ResourceLimits
-    ) -> ExecutionResult:
-        """로컬에서 향상된 코드 실행"""
-        
-        start_time = time.time()
-        config = self.language_configs[language]
-        
-        try:
-            # 임시 파일 생성
-            temp_dir = self._get_user_temp_dir(user_id)
-            filename = f"code_{execution_id[:8]}{config['extension']}"
-            temp_file = temp_dir / filename
-            
-            temp_file.write_text(code, encoding='utf-8')
-            
-            # 명령어 준비
-            command = []
-            for cmd_part in config["local_command"]:
-                if "{file}" in cmd_part:
-                    command.append(cmd_part.replace("{file}", str(temp_file)))
-                elif "{executable}" in cmd_part:
-                    executable_name = filename.rsplit('.', 1)[0]
-                    command.append(cmd_part.replace("{executable}", executable_name))
-                elif "{class}" in cmd_part:
-                    class_name = filename.rsplit('.', 1)[0]
-                    command.append(cmd_part.replace("{class}", class_name))
-                else:
-                    command.append(cmd_part)
-            
-            # 프로세스 실행
-            process = await asyncio.create_subprocess_exec(
-                *command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd=str(temp_dir)
-            )
-            
-            # 리소스 모니터링 시작
-            monitor_task = None
-            if process.pid:
-                monitor_task = asyncio.create_task(
-                    self._monitor_process_resources(process.pid, resource_limits.execution_timeout)
-                )
-            
-            # 실행 완료 대기
-            try:
-                stdout, stderr = await asyncio.wait_for(
-                    process.communicate(),
-                    timeout=resource_limits.execution_timeout
-                )
-                
-                output = stdout.decode('utf-8')
-                error_output = stderr.decode('utf-8')
-                
-                # 리소스 모니터링 중지
-                if monitor_task:
-                    monitor_task.cancel()
-                
-                execution_time = time.time() - start_time
-                
-                return ExecutionResult(
-                    success=process.returncode == 0,
-                    output=output,
-                    error=error_output,
-                    execution_time=execution_time,
-                    memory_usage_mb=self.resource_monitor.get(process.pid, {}).get("memory_mb", 0),
-                    cpu_usage_percent=self.resource_monitor.get(process.pid, {}).get("cpu_percent", 0),
-                    language=language,
-                    method="local",
-                    security_level="basic",
-                    resource_limits=asdict(resource_limits),
-                    metadata={"execution_id": execution_id, "pid": process.pid}
-                )
-                
-            except asyncio.TimeoutError:
-                # 타임아웃 시 프로세스 종료
-                process.kill()
-                await process.wait()
-                
-                if monitor_task:
-                    monitor_task.cancel()
-                
-                return ExecutionResult(
-                    success=False,
-                    output="",
-                    error=f"실행 시간 초과 ({resource_limits.execution_timeout}초)",
-                    execution_time=resource_limits.execution_timeout,
-                    memory_usage_mb=self.resource_monitor.get(process.pid, {}).get("memory_mb", 0),
-                    cpu_usage_percent=self.resource_monitor.get(process.pid, {}).get("cpu_percent", 0),
-                    language=language,
-                    method="local",
-                    security_level="basic",
-                    resource_limits=asdict(resource_limits),
-                    metadata={"execution_id": execution_id, "error_type": "timeout"}
-                )
-            
         except Exception as e:
+            logger.error(f"로컬 실행 중 오류 발생: {e}", exc_info=True)
             return ExecutionResult(
                 success=False,
                 output="",
                 error=f"로컬 실행 오류: {str(e)}",
-                execution_time=time.time() - start_time,
+                execution_time=0,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                language=language,
-                method="local",
-                security_level="basic",
-                resource_limits=asdict(resource_limits),
-                metadata={"execution_id": execution_id, "error_type": "execution_error"}
+                method="error"
             )
-    
-    async def _monitor_process_resources(self, process_id: int, timeout: int):
-        """프로세스 리소스 모니터링"""
-        start_time = time.time()
-        
-        while time.time() - start_time < timeout:
-            try:
-                resource_usage = self._monitor_resource_usage(process_id, "monitor")
-                self.resource_monitor[process_id] = resource_usage
-                await asyncio.sleep(0.5)  # 0.5초마다 모니터링
-            except Exception as e:
-                logger.warning(f"리소스 모니터링 오류: {e}")
-                break
     
     def get_execution_history(self, user_id: str = None, limit: int = 100) -> List[Dict[str, Any]]:
         """실행 히스토리 조회"""
-        history = list(self.execution_history.values())
-        
         if user_id:
-            history = [h for h in history if h["user_id"] == user_id]
-        
-        # 최신 순으로 정렬
-        history.sort(key=lambda x: x["timestamp"], reverse=True)
-        
-        return history[:limit]
+            user_history = [
+                record for record in self.execution_history.values()
+                if record["user_id"] == user_id
+            ]
+            return sorted(user_history, key=lambda x: x["timestamp"], reverse=True)[:limit]
+        else:
+            all_history = list(self.execution_history.values())
+            return sorted(all_history, key=lambda x: x["timestamp"], reverse=True)[:limit]
     
     def get_supported_languages(self) -> Dict[str, Dict[str, Any]]:
-        """지원하는 언어 목록 반환"""
-        result = {}
-        for lang, config in self.language_configs.items():
-            result[lang] = {
-                "name": config["name"],
-                "version": config["version"],
+        """지원 언어 목록"""
+        return {
+            language: {
+                "supported": config["supported"],
                 "extension": config["extension"],
-                "docker_available": self.docker_client is not None,
-                "local_available": self._check_local_availability(lang)
+                "railway_compatible": config["supported"]
             }
-        return result
-    
-    def _check_local_availability(self, language: str) -> bool:
-        """로컬 환경에서 언어 사용 가능 여부 확인"""
-        config = self.language_configs.get(language)
-        if not config:
-            return False
-        
-        try:
-            if language == "python":
-                subprocess.run(["python3", "--version"], capture_output=True, timeout=5)
-                return True
-            elif language == "javascript":
-                subprocess.run(["node", "--version"], capture_output=True, timeout=5)
-                return True
-            elif language == "java":
-                subprocess.run(["javac", "-version"], capture_output=True, timeout=5)
-                return True
-            elif language == "go":
-                subprocess.run(["go", "version"], capture_output=True, timeout=5)
-                return True
-            elif language == "rust":
-                subprocess.run(["rustc", "--version"], capture_output=True, timeout=5)
-                return True
-            elif language == "cpp":
-                subprocess.run(["g++", "--version"], capture_output=True, timeout=5)
-                return True
-            elif language == "csharp":
-                subprocess.run(["dotnet", "--version"], capture_output=True, timeout=5)
-                return True
-            elif language == "php":
-                subprocess.run(["php", "--version"], capture_output=True, timeout=5)
-                return True
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            return False
-        
-        return False
-    
-    def cleanup_user_data(self, user_id: str):
-        """사용자 데이터 정리"""
-        if user_id in self.temp_dirs:
-            try:
-                shutil.rmtree(self.temp_dirs[user_id])
-                del self.temp_dirs[user_id]
-                logger.info(f"사용자 {user_id} 임시 데이터 정리 완료")
-            except Exception as e:
-                logger.error(f"사용자 {user_id} 임시 데이터 정리 실패: {e}")
-        
-        # 실행 히스토리에서 사용자 데이터 정리
-        self.execution_history = {
-            k: v for k, v in self.execution_history.items() 
-            if v["user_id"] != user_id
+            for language, config in self.language_configs.items()
         }
     
-    def get_system_stats(self) -> Dict[str, Any]:
-        """시스템 통계 조회"""
+    def get_stats(self) -> Dict[str, Any]:
+        """서비스 통계"""
         return {
-            "docker_available": self.docker_client is not None,
             "active_users": len(self.temp_dirs),
             "total_executions": len(self.execution_history),
-            "supported_languages": len(self.language_configs),
-            "memory_usage": psutil.virtual_memory().percent,
-            "cpu_usage": psutil.cpu_percent(),
-            "timestamp": datetime.now().isoformat()
+            "supported_languages": [lang for lang, config in self.language_configs.items() if config["supported"]],
+            "docker_available": False,  # Railway 환경에서는 Docker 사용 불가
+            "railway_mode": True,
+            "security_levels": [level.value for level in SecurityLevel]
         }
