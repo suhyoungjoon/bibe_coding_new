@@ -15,7 +15,7 @@ python-multipart>=0.0.6
 docker>=6.0.0
 websockets
 psutil
-aiohttp>=5.9.0
+aiohttp>=3.9.0
 
 # PostgreSQL 지원 (AI 학습 및 프로젝트 관리용)
 asyncpg>=0.28.0
