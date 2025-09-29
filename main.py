@@ -104,10 +104,15 @@ async def root():
     }
 
 if __name__ == "__main__":
+    import os
+    
+    # Railway 환경에서는 PORT 환경 변수 사용
+    port = int(os.getenv("PORT", 8000))
+    
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
-        reload=True,
+        port=port,
+        reload=False,  # Railway에서는 reload=False
         log_level="info"
     )
