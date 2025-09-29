@@ -1,0 +1,23 @@
+# 텍스트 파일들을 UTF-8로 처리
+* text=auto eol=lf
+
+# JSON 파일들은 항상 UTF-8로 처리
+*.json text eol=lf
+
+# 설정 파일들은 항상 UTF-8로 처리
+Dockerfile text eol=lf
+Procfile text eol=lf
+runtime.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Python 파일들
+*.py text eol=lf
+
+# 문서 파일들
+*.md text eol=lf
+*.txt text eol=lf
+
+# 기타 텍스트 파일들
+*.sh text eol=lf
+*.bat text eol=lf
