@@ -168,8 +168,8 @@ Thumbs.db
 *.index
 *.faiss
 
-# Vector store data
-vectorstore/
+# Vector store data (코드는 제외하고 데이터만)
+# vectorstore/  # 코드는 버전 관리에 포함
 data/processed/
 data/embeddings/
 
