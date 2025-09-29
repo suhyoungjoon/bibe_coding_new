@@ -208,3 +208,7 @@ htmlcov/
 # Local development
 local_config.py
 dev_settings.py
+
+# Backup files
+*.bak
+*.backup
