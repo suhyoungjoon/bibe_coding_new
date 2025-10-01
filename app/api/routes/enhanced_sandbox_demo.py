@@ -609,10 +609,10 @@ for i in range(10):
 
                     <!-- 실행 컨트롤 -->
                     <div class="execution-controls">
-                        <button id="executeBtn" class="btn btn-primary" onclick="console.log('실행 버튼 클릭됨!'); testExecute();">
+                        <button id="executeBtn" class="btn btn-primary" onclick="simpleExecute()">
                             <span>▶️</span> 실행
                         </button>
-                        <button id="clearBtn" class="btn btn-secondary" onclick="console.log('지우기 버튼 클릭됨!'); testClear();">
+                        <button id="clearBtn" class="btn btn-secondary" onclick="simpleClear()">
                             <span>🗑️</span> 지우기
                         </button>
                         <button id="saveBtn" class="btn btn-success">
@@ -750,6 +750,84 @@ for i in range(10):
             function testClear() {
                 console.log('testClear 함수 호출됨!');
                 alert('지우기 버튼이 클릭되었습니다!');
+            }
+            
+            // 샌드박스 데모용 간단한 함수들
+            function simpleExecute() {
+                console.log('simpleExecute 함수 호출됨!');
+                const codeEditor = document.getElementById('codeEditor');
+                const resultSection = document.getElementById('resultSection');
+                
+                if (!codeEditor) {
+                    console.error('codeEditor를 찾을 수 없습니다!');
+                    alert('코드 에디터를 찾을 수 없습니다!');
+                    return;
+                }
+                
+                if (!resultSection) {
+                    console.error('resultSection을 찾을 수 없습니다!');
+                    alert('결과 섹션을 찾을 수 없습니다!');
+                    return;
+                }
+                
+                const code = codeEditor.value.trim();
+                console.log('실행할 코드:', code);
+                
+                if (!code) {
+                    resultSection.textContent = '❌ 실행할 코드가 없습니다.';
+                    resultSection.className = 'result-section result-error';
+                    return;
+                }
+                
+                resultSection.textContent = '실행 중...';
+                resultSection.className = 'result-section';
+                
+                // API 호출
+                fetch('/api/v1/sandbox/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        language: 'python',
+                        security_level: 'LOW',
+                        user_id: 'demo_user'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API 응답:', data);
+                    if (data.success) {
+                        resultSection.textContent = data.output;
+                        resultSection.className = 'result-section result-success';
+                    } else {
+                        resultSection.textContent = data.error || '실행 중 오류가 발생했습니다.';
+                        resultSection.className = 'result-section result-error';
+                    }
+                })
+                .catch(error => {
+                    console.error('API 오류:', error);
+                    resultSection.textContent = `❌ 네트워크 오류: ${error.message}`;
+                    resultSection.className = 'result-section result-error';
+                });
+            }
+            
+            function simpleClear() {
+                console.log('simpleClear 함수 호출됨!');
+                const codeEditor = document.getElementById('codeEditor');
+                const resultSection = document.getElementById('resultSection');
+                
+                if (codeEditor) {
+                    codeEditor.value = '';
+                    console.log('코드 에디터가 지워졌습니다');
+                }
+                
+                if (resultSection) {
+                    resultSection.textContent = '';
+                    resultSection.className = 'result-section';
+                    console.log('결과 섹션이 지워졌습니다');
+                }
             }
 
             // DOM 요소
