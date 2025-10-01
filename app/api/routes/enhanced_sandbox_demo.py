@@ -609,10 +609,10 @@ for i in range(10):
 
                     <!-- 실행 컨트롤 -->
                     <div class="execution-controls">
-                        <button id="executeBtn" class="btn btn-primary" onclick="executeCodeNow()">
+                        <button id="executeBtn" class="btn btn-primary" onclick="console.log('실행 버튼 클릭!'); alert('실행 버튼이 클릭되었습니다!');">
                             <span>▶️</span> 실행
                         </button>
-                        <button id="clearBtn" class="btn btn-secondary" onclick="clearCodeNow()">
+                        <button id="clearBtn" class="btn btn-secondary" onclick="console.log('지우기 버튼 클릭!'); alert('지우기 버튼이 클릭되었습니다!');">
                             <span>🗑️</span> 지우기
                         </button>
                         <button id="saveBtn" class="btn btn-success">
