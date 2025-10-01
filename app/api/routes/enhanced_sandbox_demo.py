@@ -442,10 +442,10 @@ for i in range(10):
 
                     <!-- 실행 컨트롤 -->
                     <div class="execution-controls">
-                        <button id="executeBtn" class="btn btn-primary">
+                        <button id="executeBtn" class="btn btn-primary" onclick="console.log('실행 버튼 클릭됨!'); testExecute();">
                             <span>▶️</span> 실행
                         </button>
-                        <button id="clearBtn" class="btn btn-secondary">
+                        <button id="clearBtn" class="btn btn-secondary" onclick="console.log('지우기 버튼 클릭됨!'); testClear();">
                             <span>🗑️</span> 지우기
                         </button>
                         <button id="saveBtn" class="btn btn-success">
@@ -564,11 +564,26 @@ for i in range(10):
         </div>
 
         <script>
+            console.log('JavaScript 시작!');
+            
             // 전역 변수
             let currentLanguage = 'python';
             let currentSecurityLevel = 'LOW';
             let executionHistory = [];
             let isExecuting = false;
+            
+            console.log('전역 변수 초기화 완료');
+
+            // 간단한 테스트 함수들
+            function testExecute() {
+                console.log('testExecute 함수 호출됨!');
+                alert('실행 버튼이 클릭되었습니다!');
+            }
+            
+            function testClear() {
+                console.log('testClear 함수 호출됨!');
+                alert('지우기 버튼이 클릭되었습니다!');
+            }
 
             // DOM 요소
             const codeEditor = document.getElementById('codeEditor');
