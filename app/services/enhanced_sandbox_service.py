@@ -42,7 +42,11 @@ class ExecutionResult:
     execution_time: float
     memory_usage_mb: float
     cpu_usage_percent: float
+    language: str
     method: str
+    security_level: str
+    resource_limits: Dict[str, Any]
+    metadata: Dict[str, Any]
 
 class EnhancedSandboxService:
     """Railway 환경 최적화 샌드박스 서비스"""
@@ -134,6 +138,9 @@ class EnhancedSandboxService:
         """Railway 환경 최적화 코드 실행"""
         logger.info(f"코드 실행 시작 - 언어: {language}, 사용자: {user_id}, 보안레벨: {security_level.value}")
         
+        resource_limits = custom_resource_limits or ResourceLimits()
+        execution_id = str(uuid.uuid4())
+        
         # 언어 지원 확인
         if language not in self.language_configs:
             return ExecutionResult(
@@ -143,7 +150,11 @@ class EnhancedSandboxService:
                 execution_time=0,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                method="validation_failed"
+                language=language,
+                method="validation_failed",
+                security_level=security_level.value,
+                resource_limits=asdict(resource_limits),
+                metadata={"execution_id": execution_id}
             )
         
         config = self.language_configs[language]
@@ -155,7 +166,11 @@ class EnhancedSandboxService:
                 execution_time=0,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                method="language_not_supported"
+                language=language,
+                method="language_not_supported",
+                security_level=security_level.value,
+                resource_limits=asdict(resource_limits),
+                metadata={"execution_id": execution_id}
             )
         
         # 보안 검증
@@ -168,28 +183,27 @@ class EnhancedSandboxService:
                 execution_time=0,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                method="security_failed"
+                language=language,
+                method="security_failed",
+                security_level=security_level.value,
+                resource_limits=asdict(resource_limits),
+                metadata={"execution_id": execution_id}
             )
-        
-        # 실행 ID 생성
-        execution_id = str(uuid.uuid4())
         
         try:
             # Railway 환경에서는 항상 로컬 실행
             result = await self._execute_locally_enhanced(
-                code, language, user_id, execution_id, 
-                custom_resource_limits or ResourceLimits()
+                code, language, user_id, execution_id, resource_limits, security_level
             )
             
             # 실행 히스토리 저장
             self.execution_history[execution_id] = {
                 "user_id": user_id,
                 "language": language,
+                "execution_mode": execution_mode.value,
                 "security_level": security_level.value,
-                "success": result.success,
-                "execution_time": result.execution_time,
                 "timestamp": datetime.now().isoformat(),
-                "method": result.method
+                "result": asdict(result)
             }
             
             return result
@@ -203,7 +217,11 @@ class EnhancedSandboxService:
                 execution_time=0,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                method="error"
+                language=language,
+                method="error",
+                security_level=security_level.value,
+                resource_limits=asdict(resource_limits),
+                metadata={"execution_id": execution_id, "error": str(e)}
             )
     
     async def _execute_locally_enhanced(
@@ -212,7 +230,8 @@ class EnhancedSandboxService:
         language: str,
         user_id: str,
         execution_id: str,
-        resource_limits: ResourceLimits
+        resource_limits: ResourceLimits,
+        security_level: SecurityLevel
     ) -> ExecutionResult:
         """로컬에서 향상된 코드 실행 (Railway 최적화)"""
         start_time = datetime.now()
@@ -224,7 +243,6 @@ class EnhancedSandboxService:
             
             # 코드 실행
             if language == "python":
-                # Python 코드 직접 실행
                 result = subprocess.run(
                     ["python3", "-c", code],
                     capture_output=True,
@@ -233,7 +251,6 @@ class EnhancedSandboxService:
                     cwd=temp_dir
                 )
             elif language == "javascript":
-                # JavaScript 코드 직접 실행
                 result = subprocess.run(
                     ["node", "-e", code],
                     capture_output=True,
@@ -249,7 +266,11 @@ class EnhancedSandboxService:
                     execution_time=0,
                     memory_usage_mb=0,
                     cpu_usage_percent=0,
-                    method="language_not_supported"
+                    language=language,
+                    method="language_not_supported",
+                    security_level=security_level.value,
+                    resource_limits=asdict(resource_limits),
+                    metadata={"execution_id": execution_id}
                 )
             
             end_time = datetime.now()
@@ -262,9 +283,13 @@ class EnhancedSandboxService:
                     output=result.stdout,
                     error=result.stderr if result.stderr else "",
                     execution_time=execution_time,
-                    memory_usage_mb=0,  # Railway에서는 정확한 메모리 측정 어려움
-                    cpu_usage_percent=0,  # Railway에서는 정확한 CPU 측정 어려움
-                    method="local"
+                    memory_usage_mb=0,
+                    cpu_usage_percent=0,
+                    language=language,
+                    method="local",
+                    security_level=security_level.value,
+                    resource_limits=asdict(resource_limits),
+                    metadata={"execution_id": execution_id, "returncode": result.returncode}
                 )
             else:
                 return ExecutionResult(
@@ -274,7 +299,11 @@ class EnhancedSandboxService:
                     execution_time=execution_time,
                     memory_usage_mb=0,
                     cpu_usage_percent=0,
-                    method="local"
+                    language=language,
+                    method="local",
+                    security_level=security_level.value,
+                    resource_limits=asdict(resource_limits),
+                    metadata={"execution_id": execution_id, "returncode": result.returncode}
                 )
                 
         except subprocess.TimeoutExpired:
@@ -285,7 +314,11 @@ class EnhancedSandboxService:
                 execution_time=resource_limits.timeout_seconds,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                method="timeout"
+                language=language,
+                method="timeout",
+                security_level=security_level.value,
+                resource_limits=asdict(resource_limits),
+                metadata={"execution_id": execution_id}
             )
         except Exception as e:
             logger.error(f"로컬 실행 중 오류 발생: {e}", exc_info=True)
@@ -296,7 +329,11 @@ class EnhancedSandboxService:
                 execution_time=0,
                 memory_usage_mb=0,
                 cpu_usage_percent=0,
-                method="error"
+                language=language,
+                method="error",
+                security_level=security_level.value,
+                resource_limits=asdict(resource_limits),
+                metadata={"execution_id": execution_id, "error": str(e)}
             )
     
     def get_execution_history(self, user_id: str = None, limit: int = 100) -> List[Dict[str, Any]]:
@@ -322,13 +359,26 @@ class EnhancedSandboxService:
             for language, config in self.language_configs.items()
         }
     
-    def get_stats(self) -> Dict[str, Any]:
-        """서비스 통계"""
+    def get_system_stats(self) -> Dict[str, Any]:
+        """시스템 통계 조회"""
         return {
+            "docker_available": False,
             "active_users": len(self.temp_dirs),
             "total_executions": len(self.execution_history),
-            "supported_languages": [lang for lang, config in self.language_configs.items() if config["supported"]],
-            "docker_available": False,  # Railway 환경에서는 Docker 사용 불가
-            "railway_mode": True,
-            "security_levels": [level.value for level in SecurityLevel]
+            "supported_languages": len([lang for lang, config in self.language_configs.items() if config["supported"]]),
+            "memory_usage": 0,
+            "cpu_usage": 0,
+            "timestamp": datetime.now().isoformat()
         }
+    
+    def cleanup_user_data(self, user_id: str):
+        """사용자 데이터 정리"""
+        if user_id in self.temp_dirs:
+            import shutil
+            temp_dir = self.temp_dirs[user_id]
+            try:
+                shutil.rmtree(temp_dir)
+                del self.temp_dirs[user_id]
+                logger.info(f"사용자 {user_id} 임시 디렉토리 삭제: {temp_dir}")
+            except Exception as e:
+                logger.error(f"임시 디렉토리 삭제 실패: {e}")
