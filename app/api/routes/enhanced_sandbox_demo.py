@@ -609,10 +609,10 @@ for i in range(10):
 
                     <!-- 실행 컨트롤 -->
                     <div class="execution-controls">
-                        <button id="executeBtn" class="btn btn-primary" onclick="console.log('실행 버튼 클릭!'); alert('실행 버튼이 클릭되었습니다!');">
+                        <button id="executeBtn" class="btn btn-primary" onclick="executeCode()">
                             <span>▶️</span> 실행
                         </button>
-                        <button id="clearBtn" class="btn btn-secondary" onclick="console.log('지우기 버튼 클릭!'); alert('지우기 버튼이 클릭되었습니다!');">
+                        <button id="clearBtn" class="btn btn-secondary" onclick="clearCode()">
                             <span>🗑️</span> 지우기
                         </button>
                         <button id="saveBtn" class="btn btn-success">
@@ -742,7 +742,7 @@ for i in range(10):
             console.log('전역 변수 초기화 완료');
 
             // 실제 API 호출 함수들
-            function executeCodeNow() {
+            function executeCode() {
                 console.log('executeCodeNow 함수 호출됨!');
                 
                 const codeEditor = document.getElementById('codeEditor');
@@ -811,7 +811,7 @@ for i in range(10):
                 });
             }
             
-            function clearCodeNow() {
+            function clearCode() {
                 console.log('clearCodeNow 함수 호출됨!');
                 
                 const codeEditor = document.getElementById('codeEditor');
