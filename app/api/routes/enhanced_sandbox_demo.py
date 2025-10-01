@@ -762,7 +762,7 @@ for ($i = 0; $i < 10; $i++) {
                 showExecutionProgress(true);
 
                 try {
-                    const response = await fetch('/api/v1/sandbox/execute-with-visualization', {
+                    const response = await fetch('/api/v1/sandbox/execute', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -779,7 +779,8 @@ for ($i = 0; $i < 10; $i++) {
 
                     if (result.success) {
                         showResult(result.output, 'success');
-                        showVisualization(result.visualization);
+                        // 시각화는 현재 지원하지 않으므로 숨김
+                        hideVisualization();
                         addToHistory(result, 'success');
                     } else {
                         showResult(result.error || '실행 중 오류가 발생했습니다.', 'error');
