@@ -11,6 +11,10 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
+# Node.js 설치 (JavaScript 실행을 위해)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
 # Python 의존성 설치
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
