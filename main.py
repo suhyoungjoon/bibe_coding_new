@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 import logging
 import os
 
-from app.api.routes import query, documents, index, health, websocket, improved_demo, ui_enhancements, sandbox, enhanced_sandbox_demo, debug, simple_test
+from app.api.routes import query, documents, index, health, websocket, improved_demo, ui_enhancements, sandbox, enhanced_sandbox_demo, debug
 from app.core.config import settings
 from app.core.exceptions import AgenticAIException
 
@@ -138,7 +138,6 @@ app.include_router(improved_demo.router, prefix="/api/v1", tags=["demo"])
 app.include_router(ui_enhancements.router, prefix="/api/v1", tags=["ui"])
 app.include_router(sandbox.router, prefix="/api/v1/sandbox", tags=["sandbox"])
 app.include_router(enhanced_sandbox_demo.router, prefix="/api/v1", tags=["demo"])
-app.include_router(simple_test.router, prefix="/api/v1", tags=["test"])  # 간단한 테스트용
 app.include_router(debug.router, prefix="/api/v1", tags=["debug"])  # Railway 디버깅용
 
 # 루트 엔드포인트

@@ -10,6 +10,173 @@ import logging
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+@router.get("/test/simple")
+async def simple_test():
+    """간단한 JavaScript 테스트 페이지"""
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>간단한 테스트</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background-color: #f0f0f0;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            button {
+                padding: 10px 20px;
+                margin: 10px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            .btn-primary {
+                background-color: #007bff;
+                color: white;
+            }
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+            }
+            .btn-success {
+                background-color: #28a745;
+                color: white;
+            }
+            #result {
+                margin-top: 20px;
+                padding: 15px;
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 5px;
+                min-height: 100px;
+                font-family: monospace;
+                white-space: pre-wrap;
+            }
+            textarea {
+                width: 100%;
+                height: 200px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-family: monospace;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🧪 JavaScript 테스트 페이지</h1>
+            <p>이 페이지는 JavaScript가 정상 작동하는지 테스트합니다.</p>
+            
+            <div>
+                <h3>코드 에디터</h3>
+                <textarea id="codeEditor" placeholder="코드를 입력하세요...">print("Hello World!")</textarea>
+            </div>
+            
+            <div>
+                <h3>테스트 버튼들</h3>
+                <button id="executeBtn" class="btn-primary" onclick="testExecute()">▶️ 실행</button>
+                <button id="clearBtn" class="btn-secondary" onclick="testClear()">🗑️ 지우기</button>
+                <button id="testBtn" class="btn-success" onclick="testAlert()">🔔 알림 테스트</button>
+            </div>
+            
+            <div>
+                <h3>결과</h3>
+                <div id="result">결과가 여기에 표시됩니다...</div>
+            </div>
+        </div>
+
+        <script>
+            console.log('=== JavaScript 시작 ===');
+            console.log('페이지 로드 완료');
+            
+            // DOM 요소 확인
+            const codeEditor = document.getElementById('codeEditor');
+            const executeBtn = document.getElementById('executeBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const testBtn = document.getElementById('testBtn');
+            const resultDiv = document.getElementById('result');
+            
+            console.log('DOM 요소들:');
+            console.log('- codeEditor:', codeEditor);
+            console.log('- executeBtn:', executeBtn);
+            console.log('- clearBtn:', clearBtn);
+            console.log('- testBtn:', testBtn);
+            console.log('- resultDiv:', resultDiv);
+            
+            // 테스트 함수들
+            function testExecute() {
+                console.log('testExecute 함수 호출됨!');
+                const code = codeEditor.value;
+                console.log('실행할 코드:', code);
+                
+                resultDiv.textContent = `실행 결과:\\n${code}\\n\\n실행 시간: ${new Date().toLocaleTimeString()}`;
+                
+                // API 호출 테스트
+                fetch('/api/v1/sandbox/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        language: 'python',
+                        security_level: 'LOW',
+                        user_id: 'test_user'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API 응답:', data);
+                    if (data.success) {
+                        resultDiv.textContent = `✅ 실행 성공!\\n\\n출력:\\n${data.output}\\n\\n실행 시간: ${data.execution_time}초`;
+                    } else {
+                        resultDiv.textContent = `❌ 실행 실패!\\n\\n오류:\\n${data.error}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('API 오류:', error);
+                    resultDiv.textContent = `❌ 네트워크 오류: ${error.message}`;
+                });
+            }
+            
+            function testClear() {
+                console.log('testClear 함수 호출됨!');
+                codeEditor.value = '';
+                resultDiv.textContent = '코드가 지워졌습니다.';
+            }
+            
+            function testAlert() {
+                console.log('testAlert 함수 호출됨!');
+                alert('JavaScript가 정상 작동합니다!');
+            }
+            
+            // 페이지 로드 완료 메시지
+            window.addEventListener('load', function() {
+                console.log('페이지 완전 로드 완료');
+                resultDiv.textContent = '페이지가 준비되었습니다. 버튼을 클릭해보세요!';
+            });
+            
+            console.log('=== JavaScript 초기화 완료 ===');
+        </script>
+    </body>
+    </html>
+    """
+    
+    return HTMLResponse(content=html_content)
+
 @router.get("/demo/sandbox")
 async def enhanced_sandbox_demo():
     """향상된 샌드박스 데모 페이지"""
