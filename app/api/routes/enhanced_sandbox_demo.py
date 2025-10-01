@@ -706,15 +706,22 @@ for ($i = 0; $i < 10; $i++) {
 
             // 초기화
             document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOM 로드 완료, 이벤트 리스너 초기화 시작');
                 initializeEventListeners();
                 updateSystemStats();
                 setInterval(updateSystemStats, 5000); // 5초마다 업데이트
+                console.log('초기화 완료');
             });
 
             function initializeEventListeners() {
+                console.log('이벤트 리스너 초기화 시작');
+                
                 // 언어 선택
-                document.querySelectorAll('.lang-btn').forEach(btn => {
+                const langButtons = document.querySelectorAll('.lang-btn');
+                console.log('언어 버튼 개수:', langButtons.length);
+                langButtons.forEach(btn => {
                     btn.addEventListener('click', function() {
+                        console.log('언어 버튼 클릭:', this.dataset.lang);
                         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
                         this.classList.add('active');
                         currentLanguage = this.dataset.lang;
@@ -723,8 +730,11 @@ for ($i = 0; $i < 10; $i++) {
                 });
 
                 // 보안 레벨 선택
-                document.querySelectorAll('.security-btn').forEach(btn => {
+                const securityButtons = document.querySelectorAll('.security-btn');
+                console.log('보안 버튼 개수:', securityButtons.length);
+                securityButtons.forEach(btn => {
                     btn.addEventListener('click', function() {
+                        console.log('보안 버튼 클릭:', this.dataset.level);
                         document.querySelectorAll('.security-btn').forEach(b => b.classList.remove('active'));
                         this.classList.add('active');
                         currentSecurityLevel = this.dataset.level;
@@ -732,6 +742,7 @@ for ($i = 0; $i < 10; $i++) {
                 });
 
                 // 버튼 이벤트
+                console.log('주요 버튼 이벤트 리스너 등록');
                 executeBtn.addEventListener('click', executeCode);
                 clearBtn.addEventListener('click', clearCode);
                 saveBtn.addEventListener('click', saveCode);
@@ -739,6 +750,8 @@ for ($i = 0; $i < 10; $i++) {
                 fileInput.addEventListener('change', loadCode);
                 refreshStatsBtn.addEventListener('click', updateSystemStats);
                 clearHistoryBtn.addEventListener('click', clearHistory);
+                
+                console.log('이벤트 리스너 초기화 완료');
             }
 
             function loadLanguageTemplate() {
@@ -749,9 +762,16 @@ for ($i = 0; $i < 10; $i++) {
             }
 
             async function executeCode() {
-                if (isExecuting) return;
+                console.log('executeCode 함수 호출됨');
+                
+                if (isExecuting) {
+                    console.log('이미 실행 중입니다');
+                    return;
+                }
 
                 const code = codeEditor.value.trim();
+                console.log('코드 길이:', code.length);
+                
                 if (!code) {
                     showResult('❌ 실행할 코드가 없습니다.', 'error');
                     return;
@@ -760,6 +780,12 @@ for ($i = 0; $i < 10; $i++) {
                 isExecuting = true;
                 updateExecutionStatus('running', '실행 중...');
                 showExecutionProgress(true);
+                
+                console.log('API 요청 시작:', {
+                    language: currentLanguage,
+                    security_level: currentSecurityLevel,
+                    code_length: code.length
+                });
 
                 try {
                     const response = await fetch('/api/v1/sandbox/execute', {
@@ -775,11 +801,12 @@ for ($i = 0; $i < 10; $i++) {
                         })
                     });
 
+                    console.log('API 응답 상태:', response.status);
                     const result = await response.json();
+                    console.log('API 응답 결과:', result);
 
                     if (result.success) {
                         showResult(result.output, 'success');
-                        // 시각화는 현재 지원하지 않으므로 숨김
                         hideVisualization();
                         addToHistory(result, 'success');
                     } else {
@@ -789,6 +816,7 @@ for ($i = 0; $i < 10; $i++) {
                     }
 
                 } catch (error) {
+                    console.error('API 요청 오류:', error);
                     showResult(`❌ 네트워크 오류: ${error.message}`, 'error');
                 } finally {
                     isExecuting = false;
@@ -915,8 +943,10 @@ for ($i = 0; $i < 10; $i++) {
             }
 
             function clearCode() {
+                console.log('clearCode 함수 호출됨');
                 codeEditor.value = '';
                 showResult('코드가 지워졌습니다.', 'success');
+                console.log('코드 에디터가 지워졌습니다');
             }
 
             function saveCode() {
