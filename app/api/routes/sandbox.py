@@ -31,7 +31,7 @@ class CodeExecutionRequest(BaseModel):
     code: str = Field(..., description="실행할 코드")
     language: str = Field(default="python", description="프로그래밍 언어")
     user_id: str = Field(default="default", description="사용자 ID")
-    execution_mode: str = Field(default="auto", description="실행 모드 (auto/docker/local)")
+    execution_mode: str = Field(default="local", description="실행 모드 (local)")
     security_level: str = Field(default="medium", description="보안 수준 (low/medium/high/maximum)")
     custom_resource_limits: Optional[Dict[str, Any]] = Field(None, description="커스텀 리소스 제한")
 

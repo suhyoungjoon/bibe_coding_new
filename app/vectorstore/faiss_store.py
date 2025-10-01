@@ -79,30 +79,29 @@ class FaissStore:
             logger.error(f"벡터 추가 실패: {e}")
             return False
     
-    def search(self, query_vector: np.ndarray, k: int = 5) -> Tuple[np.ndarray, List[Dict[str, Any]]]:
-        """벡터 검색"""
+    def search(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+        """벡터 검색 (query는 문자열)"""
         try:
             if self.is_mock:
                 # Mock 검색 결과 반환
                 logger.info(f"Mock 모드: {k}개 검색 결과 시뮬레이션")
-                scores = np.array([[0.9, 0.8, 0.7, 0.6, 0.5]])
-                mock_metadata = [
-                    {"chunk": "Mock document chunk 1", "source": "mock_doc1.txt"},
-                    {"chunk": "Mock document chunk 2", "source": "mock_doc2.txt"},
-                    {"chunk": "Mock document chunk 3", "source": "mock_doc3.txt"},
-                    {"chunk": "Mock document chunk 4", "source": "mock_doc4.txt"},
-                    {"chunk": "Mock document chunk 5", "source": "mock_doc5.txt"}
+                mock_results = [
+                    {"chunk": "Mock document chunk 1", "source": "mock_doc1.txt", "score": "0.9"},
+                    {"chunk": "Mock document chunk 2", "source": "mock_doc2.txt", "score": "0.8"},
+                    {"chunk": "Mock document chunk 3", "source": "mock_doc3.txt", "score": "0.7"},
+                    {"chunk": "Mock document chunk 4", "source": "mock_doc4.txt", "score": "0.6"},
+                    {"chunk": "Mock document chunk 5", "source": "mock_doc5.txt", "score": "0.5"}
                 ]
-                return scores, mock_metadata[:k]
+                return mock_results[:k]
             
             # 실제 FAISS 검색 로직
             logger.info(f"FAISS에서 {k}개 검색")
             # 실제 구현에서는 검색 결과 반환
-            return np.array([[0.9, 0.8, 0.7, 0.6, 0.5]]), []
+            return []
             
         except Exception as e:
             logger.error(f"벡터 검색 실패: {e}")
-            return np.array([[]]), []
+            return []
     
     def get_stats(self) -> Dict[str, Any]:
         """스토어 통계"""
