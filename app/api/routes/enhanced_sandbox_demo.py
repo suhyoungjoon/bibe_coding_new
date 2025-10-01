@@ -589,6 +589,26 @@ for i in range(10):
             const refreshStatsBtn = document.getElementById('refreshStatsBtn');
             const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 
+            // DOM 요소 존재 확인
+            console.log('=== DOM 요소 확인 ===');
+            console.log('codeEditor:', codeEditor);
+            console.log('executeBtn:', executeBtn);
+            console.log('clearBtn:', clearBtn);
+            console.log('saveBtn:', saveBtn);
+            console.log('loadBtn:', loadBtn);
+            console.log('fileInput:', fileInput);
+            console.log('executionStatus:', executionStatus);
+            console.log('statusIndicator:', statusIndicator);
+            console.log('statusText:', statusText);
+            console.log('executionProgress:', executionProgress);
+            console.log('resultSection:', resultSection);
+            console.log('visualizationSection:', visualizationSection);
+            console.log('visualizationContent:', visualizationContent);
+            console.log('systemStats:', systemStats);
+            console.log('executionHistoryDiv:', executionHistoryDiv);
+            console.log('refreshStatsBtn:', refreshStatsBtn);
+            console.log('clearHistoryBtn:', clearHistoryBtn);
+
             // 언어별 기본 코드 템플릿
             const codeTemplates = {
                 python: `# Python 예제
@@ -743,15 +763,68 @@ for ($i = 0; $i < 10; $i++) {
 
                 // 버튼 이벤트
                 console.log('주요 버튼 이벤트 리스너 등록');
-                executeBtn.addEventListener('click', executeCode);
-                clearBtn.addEventListener('click', clearCode);
-                saveBtn.addEventListener('click', saveCode);
-                loadBtn.addEventListener('click', () => fileInput.click());
-                fileInput.addEventListener('change', loadCode);
-                refreshStatsBtn.addEventListener('click', updateSystemStats);
-                clearHistoryBtn.addEventListener('click', clearHistory);
+                
+                if (executeBtn) {
+                    executeBtn.addEventListener('click', executeCode);
+                    console.log('실행 버튼 이벤트 리스너 등록 완료');
+                } else {
+                    console.error('실행 버튼을 찾을 수 없습니다!');
+                }
+                
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', clearCode);
+                    console.log('지우기 버튼 이벤트 리스너 등록 완료');
+                } else {
+                    console.error('지우기 버튼을 찾을 수 없습니다!');
+                }
+                
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', saveCode);
+                    console.log('저장 버튼 이벤트 리스너 등록 완료');
+                } else {
+                    console.error('저장 버튼을 찾을 수 없습니다!');
+                }
+                
+                if (loadBtn && fileInput) {
+                    loadBtn.addEventListener('click', () => fileInput.click());
+                    fileInput.addEventListener('change', loadCode);
+                    console.log('로드 버튼 이벤트 리스너 등록 완료');
+                } else {
+                    console.error('로드 버튼 또는 파일 입력을 찾을 수 없습니다!');
+                }
+                
+                if (refreshStatsBtn) {
+                    refreshStatsBtn.addEventListener('click', updateSystemStats);
+                    console.log('상태 새로고침 버튼 이벤트 리스너 등록 완료');
+                } else {
+                    console.error('상태 새로고침 버튼을 찾을 수 없습니다!');
+                }
+                
+                if (clearHistoryBtn) {
+                    clearHistoryBtn.addEventListener('click', clearHistory);
+                    console.log('히스토리 지우기 버튼 이벤트 리스너 등록 완료');
+                } else {
+                    console.error('히스토리 지우기 버튼을 찾을 수 없습니다!');
+                }
                 
                 console.log('이벤트 리스너 초기화 완료');
+                
+                // 추가 디버깅: 직접 onclick 이벤트도 설정
+                if (executeBtn) {
+                    executeBtn.onclick = function() {
+                        console.log('실행 버튼 onclick 이벤트 발생!');
+                        executeCode();
+                    };
+                    console.log('실행 버튼 onclick 이벤트 설정 완료');
+                }
+                
+                if (clearBtn) {
+                    clearBtn.onclick = function() {
+                        console.log('지우기 버튼 onclick 이벤트 발생!');
+                        clearCode();
+                    };
+                    console.log('지우기 버튼 onclick 이벤트 설정 완료');
+                }
             }
 
             function loadLanguageTemplate() {
