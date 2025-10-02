@@ -586,14 +586,14 @@ async def enhanced_sandbox_demo():
 
                     <!-- 언어 선택 -->
                     <div class="language-selector">
-                        <div class="lang-btn active" data-lang="python">🐍 Python</div>
-                        <div class="lang-btn" data-lang="javascript">🟨 JavaScript</div>
-                        <div class="lang-btn" data-lang="java">☕ Java</div>
-                        <div class="lang-btn" data-lang="go">🐹 Go</div>
-                        <div class="lang-btn" data-lang="rust">🦀 Rust</div>
-                        <div class="lang-btn" data-lang="cpp">⚡ C++</div>
-                        <div class="lang-btn" data-lang="csharp">🔷 C#</div>
-                        <div class="lang-btn" data-lang="php">🐘 PHP</div>
+                        <div class="lang-btn active" data-lang="python" onclick="selectLanguage('python', this)">🐍 Python</div>
+                        <div class="lang-btn" data-lang="javascript" onclick="selectLanguage('javascript', this)">🟨 JavaScript</div>
+                        <div class="lang-btn" data-lang="java" onclick="selectLanguage('java', this)">☕ Java</div>
+                        <div class="lang-btn" data-lang="go" onclick="selectLanguage('go', this)">🐹 Go</div>
+                        <div class="lang-btn" data-lang="rust" onclick="selectLanguage('rust', this)">🦀 Rust</div>
+                        <div class="lang-btn" data-lang="cpp" onclick="selectLanguage('cpp', this)">⚡ C++</div>
+                        <div class="lang-btn" data-lang="csharp" onclick="selectLanguage('csharp', this)">🔷 C#</div>
+                        <div class="lang-btn" data-lang="php" onclick="selectLanguage('php', this)">🐘 PHP</div>
                     </div>
 
                     <!-- 코드 에디터 -->
@@ -795,6 +795,86 @@ for i in range(10):
             let isExecuting = false;
             
             console.log('전역 변수 초기화 완료');
+
+            // 언어 선택 함수
+            function selectLanguage(language, element) {
+                console.log('언어 선택:', language);
+                
+                // 모든 언어 버튼에서 active 클래스 제거
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // 선택된 버튼에 active 클래스 추가
+                element.classList.add('active');
+                
+                // 전역 변수 업데이트
+                currentLanguage = language;
+                
+                // 언어별 코드 템플릿 로드
+                const codeTemplates = {
+                    python: `# Python 예제
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# 피보나치 수열 계산
+for i in range(10):
+    print(f"F({i}) = {fibonacci(i)}")`,
+
+                    javascript: `// JavaScript 예제
+function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// 피보나치 수열 계산
+for (let i = 0; i < 10; i++) {
+    console.log(\`F(\${i}) = \${fibonacci(i)}\`);
+}`,
+
+                    java: `// Java 예제
+public class Fibonacci {
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("F(" + i + ") = " + fibonacci(i));
+        }
+    }
+    
+    public static int fibonacci(int n) {
+        if (n <= 1) return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}`,
+
+                    go: `// Go 예제
+package main
+
+import "fmt"
+
+func fibonacci(n int) int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n-1) + fibonacci(n-2)
+}
+
+func main() {
+    for i := 0; i < 10; i++ {
+        fmt.Printf("F(%d) = %d\\n", i, fibonacci(i))
+    }
+}`
+                };
+                
+                const codeEditor = document.getElementById('codeEditor');
+                if (codeEditor && codeTemplates[language]) {
+                    codeEditor.value = codeTemplates[language];
+                    console.log('코드 템플릿 로드됨:', language);
+                }
+                
+                alert(`언어가 ${language}로 변경되었습니다!`);
+            }
 
             // 인라인 함수들 (onclick에서 호출)
             function executeCodeInline() {
