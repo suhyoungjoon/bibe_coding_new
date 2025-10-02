@@ -586,14 +586,62 @@ async def enhanced_sandbox_demo():
 
                     <!-- 언어 선택 -->
                     <div class="language-selector">
-                        <div class="lang-btn active" data-lang="python" onclick="selectLanguage('python', this)">🐍 Python</div>
-                        <div class="lang-btn" data-lang="javascript" onclick="selectLanguage('javascript', this)">🟨 JavaScript</div>
-                        <div class="lang-btn" data-lang="java" onclick="selectLanguage('java', this)">☕ Java</div>
-                        <div class="lang-btn" data-lang="go" onclick="selectLanguage('go', this)">🐹 Go</div>
-                        <div class="lang-btn" data-lang="rust" onclick="selectLanguage('rust', this)">🦀 Rust</div>
-                        <div class="lang-btn" data-lang="cpp" onclick="selectLanguage('cpp', this)">⚡ C++</div>
-                        <div class="lang-btn" data-lang="csharp" onclick="selectLanguage('csharp', this)">🔷 C#</div>
-                        <div class="lang-btn" data-lang="php" onclick="selectLanguage('php', this)">🐘 PHP</div>
+                        <div class="lang-btn active" data-lang="python" onclick="
+                            console.log('Python 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '# Python 예제\\ndef fibonacci(n):\\n    if n <= 1:\\n        return n\\n    return fibonacci(n-1) + fibonacci(n-2)\\n\\n# 피보나치 수열 계산\\nfor i in range(10):\\n    print(f\"F({i}) = {fibonacci(i)}\")';
+                            alert('언어가 python으로 변경되었습니다!');
+                        ">🐍 Python</div>
+                        <div class="lang-btn" data-lang="javascript" onclick="
+                            console.log('JavaScript 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '// JavaScript 고급 예제 - 배열 조작과 비동기 처리\\nconsole.log(\"=== JavaScript 고급 예제 ===\");\\n\\n// 1. 배열 메서드 체이닝\\nconst numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\\nconst result = numbers\\n    .filter(n => n % 2 === 0)  // 짝수만 필터링\\n    .map(n => n * n)           // 제곱 계산\\n    .reduce((sum, n) => sum + n, 0); // 합계 계산\\n\\nconsole.log(\"원본 배열:\", numbers);\\nconsole.log(\"짝수의 제곱의 합:\", result);\\n\\n// 2. 객체 조작\\nconst users = [\\n    { name: \"Alice\", age: 25, city: \"Seoul\" },\\n    { name: \"Bob\", age: 30, city: \"Busan\" },\\n    { name: \"Charlie\", age: 35, city: \"Seoul\" }\\n];\\n\\nconst seoulUsers = users.filter(user => user.city === \"Seoul\");\\nconsole.log(\"서울 거주자:\", seoulUsers);\\n\\n// 3. 클래스와 상속\\nclass Animal {\\n    constructor(name) {\\n        this.name = name;\\n    }\\n    \\n    speak() {\\n        console.log(`${this.name}가 소리를 냅니다.`);\\n    }\\n}\\n\\nclass Dog extends Animal {\\n    speak() {\\n        console.log(`${this.name}가 멍멍 짖습니다!`);\\n    }\\n}\\n\\nconst myDog = new Dog(\"멍멍이\");\\nmyDog.speak();';
+                            alert('언어가 javascript로 변경되었습니다!');
+                        ">🟨 JavaScript</div>
+                        <div class="lang-btn" data-lang="java" onclick="
+                            console.log('Java 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '// Java 예제\\npublic class Fibonacci {\\n    public static void main(String[] args) {\\n        for (int i = 0; i < 10; i++) {\\n            System.out.println(\"F(\" + i + \") = \" + fibonacci(i));\\n        }\\n    }\\n    \\n    public static int fibonacci(int n) {\\n        if (n <= 1) return n;\\n        return fibonacci(n - 1) + fibonacci(n - 2);\\n    }\\n}';
+                            alert('언어가 java로 변경되었습니다!');
+                        ">☕ Java</div>
+                        <div class="lang-btn" data-lang="go" onclick="
+                            console.log('Go 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '// Go 예제\\npackage main\\n\\nimport \"fmt\"\\n\\nfunc fibonacci(n int) int {\\n    if n <= 1 {\\n        return n\\n    }\\n    return fibonacci(n-1) + fibonacci(n-2)\\n}\\n\\nfunc main() {\\n    for i := 0; i < 10; i++ {\\n        fmt.Printf(\"F(%d) = %d\\n\", i, fibonacci(i))\\n    }\\n}';
+                            alert('언어가 go로 변경되었습니다!');
+                        ">🐹 Go</div>
+                        <div class="lang-btn" data-lang="rust" onclick="
+                            console.log('Rust 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '// Rust 예제\\nfn fibonacci(n: u32) -> u32 {\\n    if n <= 1 {\\n        return n;\\n    }\\n    fibonacci(n - 1) + fibonacci(n - 2)\\n}\\n\\nfn main() {\\n    for i in 0..10 {\\n        println!(\"F({}) = {}\", i, fibonacci(i));\\n    }\\n}';
+                            alert('언어가 rust로 변경되었습니다!');
+                        ">🦀 Rust</div>
+                        <div class="lang-btn" data-lang="cpp" onclick="
+                            console.log('C++ 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '#include <iostream>\\nusing namespace std;\\n\\nint fibonacci(int n) {\\n    if (n <= 1) return n;\\n    return fibonacci(n - 1) + fibonacci(n - 2);\\n}\\n\\nint main() {\\n    for (int i = 0; i < 10; i++) {\\n        cout << \"F(\" << i << \") = \" << fibonacci(i) << endl;\\n    }\\n    return 0;\\n}';
+                            alert('언어가 cpp로 변경되었습니다!');
+                        ">⚡ C++</div>
+                        <div class="lang-btn" data-lang="csharp" onclick="
+                            console.log('C# 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '// C# 예제\\nusing System;\\n\\nclass Program {\\n    static int Fibonacci(int n) {\\n        if (n <= 1) return n;\\n        return Fibonacci(n - 1) + Fibonacci(n - 2);\\n    }\\n    \\n    static void Main() {\\n        for (int i = 0; i < 10; i++) {\\n            Console.WriteLine($\"F({i}) = {Fibonacci(i)}\");\\n        }\\n    }\\n}';
+                            alert('언어가 csharp로 변경되었습니다!');
+                        ">🔷 C#</div>
+                        <div class="lang-btn" data-lang="php" onclick="
+                            console.log('PHP 선택됨');
+                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                            this.classList.add('active');
+                            document.getElementById('codeEditor').value = '<?php\\n// PHP 예제\\nfunction fibonacci($n) {\\n    if ($n <= 1) return $n;\\n    return fibonacci($n - 1) + fibonacci($n - 2);\\n}\\n\\n// 피보나치 수열 계산\\nfor ($i = 0; $i < 10; $i++) {\\n    echo \"F($i) = \" . fibonacci($i) . \"\\n\";\\n}\\n?>';
+                            alert('언어가 php로 변경되었습니다!');
+                        ">🐘 PHP</div>
                     </div>
 
                     <!-- 코드 에디터 -->
