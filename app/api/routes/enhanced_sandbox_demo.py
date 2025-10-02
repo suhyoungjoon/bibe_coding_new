@@ -584,26 +584,10 @@ async def enhanced_sandbox_demo():
                         코드 에디터
                     </div>
 
-                    <!-- 새로운 언어 선택기 -->
+                    <!-- 간단한 언어 선택기 -->
                     <div class="language-selector-new">
                         <label for="languageSelect">프로그래밍 언어 선택:</label>
-                        <select id="languageSelect" onchange="
-                            const language = this.value;
-                            console.log('선택된 언어:', language);
-                            
-                            const codeTemplates = {
-                                python: '# Python 예제\\ndef fibonacci(n):\\n    if n <= 1:\\n        return n\\n    return fibonacci(n-1) + fibonacci(n-2)\\n\\n# 피보나치 수열 계산\\nfor i in range(10):\\n    print(f\"F({i}) = {fibonacci(i)}\")',
-                                javascript: '// JavaScript 예제\\nconsole.log(\"Hello World!\");\\n\\nlet a = 10;\\nlet b = 20;\\nlet sum = a + b;\\nconsole.log(\"Sum:\", sum);\\n\\nconst numbers = [1, 2, 3, 4, 5];\\nconst doubled = numbers.map(n => n * 2);\\nconsole.log(\"Original:\", numbers);\\nconsole.log(\"Doubled:\", doubled);\\n\\nfor (let i = 0; i < 5; i++) {\\n    console.log(\"Count:\", i);\\n}',
-                                java: '// Java 예제\\npublic class Fibonacci {\\n    public static void main(String[] args) {\\n        for (int i = 0; i < 10; i++) {\\n            System.out.println(\"F(\" + i + \") = \" + fibonacci(i));\\n        }\\n    }\\n    \\n    public static int fibonacci(int n) {\\n        if (n <= 1) return n;\\n        return fibonacci(n - 1) + fibonacci(n - 2);\\n    }\\n}',
-                                go: '// Go 예제\\npackage main\\n\\nimport \"fmt\"\\n\\nfunc fibonacci(n int) int {\\n    if n <= 1 {\\n        return n\\n    }\\n    return fibonacci(n-1) + fibonacci(n-2)\\n}\\n\\nfunc main() {\\n    for i := 0; i < 10; i++ {\\n        fmt.Printf(\"F(%d) = %d\\n\", i, fibonacci(i))\\n    }\\n}',
-                                rust: '// Rust 예제\\nfn fibonacci(n: u32) -> u32 {\\n    if n <= 1 {\\n        return n;\\n    }\\n    fibonacci(n - 1) + fibonacci(n - 2)\\n}\\n\\nfn main() {\\n    for i in 0..10 {\\n        println!(\"F({}) = {}\", i, fibonacci(i));\\n    }\\n}',
-                                cpp: '#include <iostream>\\nusing namespace std;\\n\\nint fibonacci(int n) {\\n    if (n <= 1) return n;\\n    return fibonacci(n - 1) + fibonacci(n - 2);\\n}\\n\\nint main() {\\n    for (int i = 0; i < 10; i++) {\\n        cout << \"F(\" << i << \") = \" << fibonacci(i) << endl;\\n    }\\n    return 0;\\n}',
-                                csharp: '// C# 예제\\nusing System;\\n\\nclass Program {\\n    static int Fibonacci(int n) {\\n        if (n <= 1) return n;\\n        return Fibonacci(n - 1) + Fibonacci(n - 2);\\n    }\\n    \\n    static void Main() {\\n        for (int i = 0; i < 10; i++) {\\n            Console.WriteLine($\"F({i}) = {Fibonacci(i)}\");\\n        }\\n    }\\n}',
-                                php: '<?php\\n// PHP 예제\\nfunction fibonacci($n) {\\n    if ($n <= 1) return $n;\\n    return fibonacci($n - 1) + fibonacci($n - 2);\\n}\\n\\n// 피보나치 수열 계산\\nfor ($i = 0; $i < 10; $i++) {\\n    echo \"F($i) = \" . fibonacci($i) . \"\\n\";\\n}\\n?>'
-                            };
-                            
-                            const codeEditor = document.getElementById('codeEditor');\\n                            if (codeEditor && codeTemplates[language]) {\\n                                codeEditor.value = codeTemplates[language];\\n                                console.log('코드 템플릿 로드됨:', language);\\n                                alert(`언어가 ${language}로 변경되었습니다!`);\\n                            }
-                        ">
+                        <select id="languageSelect">
                             <option value="python">🐍 Python</option>
                             <option value="javascript">🟨 JavaScript</option>
                             <option value="java">☕ Java</option>
@@ -613,6 +597,7 @@ async def enhanced_sandbox_demo():
                             <option value="csharp">🔷 C#</option>
                             <option value="php">🐘 PHP</option>
                         </select>
+                        <button onclick="loadLanguageTemplate()" style="margin-left: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">코드 로드</button>
                     </div>
 
                     <!-- 코드 에디터 -->
@@ -814,6 +799,139 @@ for i in range(10):
             let isExecuting = false;
             
             console.log('전역 변수 초기화 완료');
+
+            // 언어 템플릿 로드 함수
+            function loadLanguageTemplate() {
+                const select = document.getElementById('languageSelect');
+                const language = select.value;
+                console.log('선택된 언어:', language);
+                
+                const codeTemplates = {
+                    python: `# Python 예제
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# 피보나치 수열 계산
+for i in range(10):
+    print(f"F({i}) = {fibonacci(i)}")`,
+
+                    javascript: `// JavaScript 예제
+console.log("Hello World!");
+
+let a = 10;
+let b = 20;
+let sum = a + b;
+console.log("Sum:", sum);
+
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(n => n * 2);
+console.log("Original:", numbers);
+console.log("Doubled:", doubled);
+
+for (let i = 0; i < 5; i++) {
+    console.log("Count:", i);
+}`,
+
+                    java: `// Java 예제
+public class Fibonacci {
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("F(" + i + ") = " + fibonacci(i));
+        }
+    }
+    
+    public static int fibonacci(int n) {
+        if (n <= 1) return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}`,
+
+                    go: `// Go 예제
+package main
+
+import "fmt"
+
+func fibonacci(n int) int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n-1) + fibonacci(n-2)
+}
+
+func main() {
+    for i := 0; i < 10; i++ {
+        fmt.Printf("F(%d) = %d\\n", i, fibonacci(i))
+    }
+}`,
+
+                    rust: `// Rust 예제
+fn fibonacci(n: u32) -> u32 {
+    if n <= 1 {
+        return n;
+    }
+    fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+fn main() {
+    for i in 0..10 {
+        println!("F({}) = {}", i, fibonacci(i));
+    }
+}`,
+
+                    cpp: `#include <iostream>
+using namespace std;
+
+int fibonacci(int n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int main() {
+    for (int i = 0; i < 10; i++) {
+        cout << "F(" << i << ") = " << fibonacci(i) << endl;
+    }
+    return 0;
+}`,
+
+                    csharp: `// C# 예제
+using System;
+
+class Program {
+    static int Fibonacci(int n) {
+        if (n <= 1) return n;
+        return Fibonacci(n - 1) + Fibonacci(n - 2);
+    }
+    
+    static void Main() {
+        for (int i = 0; i < 10; i++) {
+            Console.WriteLine($"F({i}) = {Fibonacci(i)}");
+        }
+    }
+}`,
+
+                    php: `<?php
+// PHP 예제
+function fibonacci($n) {
+    if ($n <= 1) return $n;
+    return fibonacci($n - 1) + fibonacci($n - 2);
+}
+
+// 피보나치 수열 계산
+for ($i = 0; $i < 10; $i++) {
+    echo "F($i) = " . fibonacci($i) . "\\n";
+}
+?>`
+                };
+                
+                const codeEditor = document.getElementById('codeEditor');
+                if (codeEditor && codeTemplates[language]) {
+                    codeEditor.value = codeTemplates[language];
+                    console.log('코드 템플릿 로드됨:', language);
+                    alert(`언어가 ${language}로 변경되었습니다!`);
+                }
+            }
 
             // 새로운 언어 변경 함수
             function changeLanguage() {
