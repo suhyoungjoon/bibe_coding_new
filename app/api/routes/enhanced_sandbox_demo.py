@@ -823,16 +823,65 @@ def fibonacci(n):
 for i in range(10):
     print(f"F({i}) = {fibonacci(i)}")`,
 
-                    javascript: `// JavaScript 예제
-function fibonacci(n) {
-    if (n <= 1) return n;
-    return fibonacci(n - 1) + fibonacci(n - 2);
+                    javascript: `// JavaScript 고급 예제 - 배열 조작과 비동기 처리
+console.log("=== JavaScript 고급 예제 ===");
+
+// 1. 배열 메서드 체이닝
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const result = numbers
+    .filter(n => n % 2 === 0)  // 짝수만 필터링
+    .map(n => n * n)           // 제곱 계산
+    .reduce((sum, n) => sum + n, 0); // 합계 계산
+
+console.log("원본 배열:", numbers);
+console.log("짝수의 제곱의 합:", result);
+
+// 2. 객체 조작
+const users = [
+    { name: "Alice", age: 25, city: "Seoul" },
+    { name: "Bob", age: 30, city: "Busan" },
+    { name: "Charlie", age: 35, city: "Seoul" }
+];
+
+const seoulUsers = users.filter(user => user.city === "Seoul");
+console.log("서울 거주자:", seoulUsers);
+
+// 3. 클래스와 상속
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+    
+    speak() {
+        console.log(\`\${this.name}가 소리를 냅니다.\`);
+    }
 }
 
-// 피보나치 수열 계산
-for (let i = 0; i < 10; i++) {
-    console.log(\`F(\${i}) = \${fibonacci(i)}\`);
-}`,
+class Dog extends Animal {
+    speak() {
+        console.log(\`\${this.name}가 멍멍 짖습니다!\`);
+    }
+}
+
+const myDog = new Dog("멍멍이");
+myDog.speak();
+
+// 4. 비동기 처리 (Promise)
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function asyncExample() {
+    console.log("비동기 작업 시작...");
+    await delay(1000);
+    console.log("1초 후 실행됨!");
+    await delay(500);
+    console.log("추가 0.5초 후 실행됨!");
+}
+
+asyncExample().then(() => {
+    console.log("모든 비동기 작업 완료!");
+});`,
 
                     java: `// Java 예제
 public class Fibonacci {
