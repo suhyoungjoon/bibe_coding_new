@@ -584,64 +584,19 @@ async def enhanced_sandbox_demo():
                         코드 에디터
                     </div>
 
-                    <!-- 언어 선택 -->
-                    <div class="language-selector">
-                        <div class="lang-btn active" data-lang="python" onclick="
-                            console.log('Python 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '# Python 예제\\ndef fibonacci(n):\\n    if n <= 1:\\n        return n\\n    return fibonacci(n-1) + fibonacci(n-2)\\n\\n# 피보나치 수열 계산\\nfor i in range(10):\\n    print(f\"F({i}) = {fibonacci(i)}\")';
-                            alert('언어가 python으로 변경되었습니다!');
-                        ">🐍 Python</div>
-                        <div class="lang-btn" data-lang="javascript" onclick="
-                            console.log('JavaScript 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '// JavaScript 고급 예제 - 배열 조작과 비동기 처리\\nconsole.log(\"=== JavaScript 고급 예제 ===\");\\n\\n// 1. 배열 메서드 체이닝\\nconst numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\\nconst result = numbers\\n    .filter(n => n % 2 === 0)  // 짝수만 필터링\\n    .map(n => n * n)           // 제곱 계산\\n    .reduce((sum, n) => sum + n, 0); // 합계 계산\\n\\nconsole.log(\"원본 배열:\", numbers);\\nconsole.log(\"짝수의 제곱의 합:\", result);\\n\\n// 2. 객체 조작\\nconst users = [\\n    { name: \"Alice\", age: 25, city: \"Seoul\" },\\n    { name: \"Bob\", age: 30, city: \"Busan\" },\\n    { name: \"Charlie\", age: 35, city: \"Seoul\" }\\n];\\n\\nconst seoulUsers = users.filter(user => user.city === \"Seoul\");\\nconsole.log(\"서울 거주자:\", seoulUsers);\\n\\n// 3. 클래스와 상속\\nclass Animal {\\n    constructor(name) {\\n        this.name = name;\\n    }\\n    \\n    speak() {\\n        console.log(`${this.name}가 소리를 냅니다.`);\\n    }\\n}\\n\\nclass Dog extends Animal {\\n    speak() {\\n        console.log(`${this.name}가 멍멍 짖습니다!`);\\n    }\\n}\\n\\nconst myDog = new Dog(\"멍멍이\");\\nmyDog.speak();';
-                            alert('언어가 javascript로 변경되었습니다!');
-                        ">🟨 JavaScript</div>
-                        <div class="lang-btn" data-lang="java" onclick="
-                            console.log('Java 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '// Java 예제\\npublic class Fibonacci {\\n    public static void main(String[] args) {\\n        for (int i = 0; i < 10; i++) {\\n            System.out.println(\"F(\" + i + \") = \" + fibonacci(i));\\n        }\\n    }\\n    \\n    public static int fibonacci(int n) {\\n        if (n <= 1) return n;\\n        return fibonacci(n - 1) + fibonacci(n - 2);\\n    }\\n}';
-                            alert('언어가 java로 변경되었습니다!');
-                        ">☕ Java</div>
-                        <div class="lang-btn" data-lang="go" onclick="
-                            console.log('Go 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '// Go 예제\\npackage main\\n\\nimport \"fmt\"\\n\\nfunc fibonacci(n int) int {\\n    if n <= 1 {\\n        return n\\n    }\\n    return fibonacci(n-1) + fibonacci(n-2)\\n}\\n\\nfunc main() {\\n    for i := 0; i < 10; i++ {\\n        fmt.Printf(\"F(%d) = %d\\n\", i, fibonacci(i))\\n    }\\n}';
-                            alert('언어가 go로 변경되었습니다!');
-                        ">🐹 Go</div>
-                        <div class="lang-btn" data-lang="rust" onclick="
-                            console.log('Rust 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '// Rust 예제\\nfn fibonacci(n: u32) -> u32 {\\n    if n <= 1 {\\n        return n;\\n    }\\n    fibonacci(n - 1) + fibonacci(n - 2)\\n}\\n\\nfn main() {\\n    for i in 0..10 {\\n        println!(\"F({}) = {}\", i, fibonacci(i));\\n    }\\n}';
-                            alert('언어가 rust로 변경되었습니다!');
-                        ">🦀 Rust</div>
-                        <div class="lang-btn" data-lang="cpp" onclick="
-                            console.log('C++ 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '#include <iostream>\\nusing namespace std;\\n\\nint fibonacci(int n) {\\n    if (n <= 1) return n;\\n    return fibonacci(n - 1) + fibonacci(n - 2);\\n}\\n\\nint main() {\\n    for (int i = 0; i < 10; i++) {\\n        cout << \"F(\" << i << \") = \" << fibonacci(i) << endl;\\n    }\\n    return 0;\\n}';
-                            alert('언어가 cpp로 변경되었습니다!');
-                        ">⚡ C++</div>
-                        <div class="lang-btn" data-lang="csharp" onclick="
-                            console.log('C# 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '// C# 예제\\nusing System;\\n\\nclass Program {\\n    static int Fibonacci(int n) {\\n        if (n <= 1) return n;\\n        return Fibonacci(n - 1) + Fibonacci(n - 2);\\n    }\\n    \\n    static void Main() {\\n        for (int i = 0; i < 10; i++) {\\n            Console.WriteLine($\"F({i}) = {Fibonacci(i)}\");\\n        }\\n    }\\n}';
-                            alert('언어가 csharp로 변경되었습니다!');
-                        ">🔷 C#</div>
-                        <div class="lang-btn" data-lang="php" onclick="
-                            console.log('PHP 선택됨');
-                            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                            this.classList.add('active');
-                            document.getElementById('codeEditor').value = '<?php\\n// PHP 예제\\nfunction fibonacci($n) {\\n    if ($n <= 1) return $n;\\n    return fibonacci($n - 1) + fibonacci($n - 2);\\n}\\n\\n// 피보나치 수열 계산\\nfor ($i = 0; $i < 10; $i++) {\\n    echo \"F($i) = \" . fibonacci($i) . \"\\n\";\\n}\\n?>';
-                            alert('언어가 php로 변경되었습니다!');
-                        ">🐘 PHP</div>
+                    <!-- 새로운 언어 선택기 -->
+                    <div class="language-selector-new">
+                        <label for="languageSelect">프로그래밍 언어 선택:</label>
+                        <select id="languageSelect" onchange="changeLanguage()">
+                            <option value="python">🐍 Python</option>
+                            <option value="javascript">🟨 JavaScript</option>
+                            <option value="java">☕ Java</option>
+                            <option value="go">🐹 Go</option>
+                            <option value="rust">🦀 Rust</option>
+                            <option value="cpp">⚡ C++</option>
+                            <option value="csharp">🔷 C#</option>
+                            <option value="php">🐘 PHP</option>
+                        </select>
                     </div>
 
                     <!-- 코드 에디터 -->
@@ -672,8 +627,8 @@ for i in range(10):
                             }
                             
                             // 현재 선택된 언어 확인
-                            const activeLangBtn = document.querySelector('.lang-btn.active');
-                            const language = activeLangBtn ? activeLangBtn.dataset.lang : 'python';
+                            const languageSelect = document.getElementById('languageSelect');
+                            const language = languageSelect ? languageSelect.value : 'python';
                             console.log('선택된 언어:', language);
                             
                             resultSection.textContent = '실행 중...';
@@ -843,6 +798,165 @@ for i in range(10):
             let isExecuting = false;
             
             console.log('전역 변수 초기화 완료');
+
+            // 새로운 언어 변경 함수
+            function changeLanguage() {
+                const select = document.getElementById('languageSelect');
+                const language = select.value;
+                console.log('선택된 언어:', language);
+                
+                const codeTemplates = {
+                    python: `# Python 예제
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# 피보나치 수열 계산
+for i in range(10):
+    print(f"F({i}) = {fibonacci(i)}")`,
+
+                    javascript: `// JavaScript 고급 예제
+console.log("=== JavaScript 고급 예제 ===");
+
+// 1. 배열 메서드 체이닝
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const result = numbers
+    .filter(n => n % 2 === 0)  // 짝수만 필터링
+    .map(n => n * n)           // 제곱 계산
+    .reduce((sum, n) => sum + n, 0); // 합계 계산
+
+console.log("원본 배열:", numbers);
+console.log("짝수의 제곱의 합:", result);
+
+// 2. 객체 조작
+const users = [
+    { name: "Alice", age: 25, city: "Seoul" },
+    { name: "Bob", age: 30, city: "Busan" },
+    { name: "Charlie", age: 35, city: "Seoul" }
+];
+
+const seoulUsers = users.filter(user => user.city === "Seoul");
+console.log("서울 거주자:", seoulUsers);
+
+// 3. 클래스와 상속
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+    
+    speak() {
+        console.log(\`\${this.name}가 소리를 냅니다.\`);
+    }
+}
+
+class Dog extends Animal {
+    speak() {
+        console.log(\`\${this.name}가 멍멍 짖습니다!\`);
+    }
+}
+
+const myDog = new Dog("멍멍이");
+myDog.speak();`,
+
+                    java: `// Java 예제
+public class Fibonacci {
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("F(" + i + ") = " + fibonacci(i));
+        }
+    }
+    
+    public static int fibonacci(int n) {
+        if (n <= 1) return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}`,
+
+                    go: `// Go 예제
+package main
+
+import "fmt"
+
+func fibonacci(n int) int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n-1) + fibonacci(n-2)
+}
+
+func main() {
+    for i := 0; i < 10; i++ {
+        fmt.Printf("F(%d) = %d\\n", i, fibonacci(i))
+    }
+}`,
+
+                    rust: `// Rust 예제
+fn fibonacci(n: u32) -> u32 {
+    if n <= 1 {
+        return n;
+    }
+    fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+fn main() {
+    for i in 0..10 {
+        println!("F({}) = {}", i, fibonacci(i));
+    }
+}`,
+
+                    cpp: `#include <iostream>
+using namespace std;
+
+int fibonacci(int n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int main() {
+    for (int i = 0; i < 10; i++) {
+        cout << "F(" << i << ") = " << fibonacci(i) << endl;
+    }
+    return 0;
+}`,
+
+                    csharp: `// C# 예제
+using System;
+
+class Program {
+    static int Fibonacci(int n) {
+        if (n <= 1) return n;
+        return Fibonacci(n - 1) + Fibonacci(n - 2);
+    }
+    
+    static void Main() {
+        for (int i = 0; i < 10; i++) {
+            Console.WriteLine($"F({i}) = {Fibonacci(i)}");
+        }
+    }
+}`,
+
+                    php: `<?php
+// PHP 예제
+function fibonacci($n) {
+    if ($n <= 1) return $n;
+    return fibonacci($n - 1) + fibonacci($n - 2);
+}
+
+// 피보나치 수열 계산
+for ($i = 0; $i < 10; $i++) {
+    echo "F($i) = " . fibonacci($i) . "\\n";
+}
+?>`
+                };
+                
+                const codeEditor = document.getElementById('codeEditor');
+                if (codeEditor && codeTemplates[language]) {
+                    codeEditor.value = codeTemplates[language];
+                    console.log('코드 템플릿 로드됨:', language);
+                    alert(`언어가 ${language}로 변경되었습니다!`);
+                }
+            }
 
             // 언어 선택 함수
             function selectLanguage(language, element) {
@@ -1791,6 +1905,43 @@ async def simple_sandbox_demo():
             }
             .language-selector {
                 margin-bottom: 20px;
+            }
+            
+            .language-selector-new {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #f8fafc;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+            }
+            
+            .language-selector-new label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #374151;
+            }
+            
+            .language-selector-new select {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 16px;
+                background: white;
+                color: #374151;
+                cursor: pointer;
+                transition: border-color 0.2s ease;
+            }
+            
+            .language-selector-new select:hover {
+                border-color: #667eea;
+            }
+            
+            .language-selector-new select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             }
             .lang-btn {
                 padding: 10px 15px;
