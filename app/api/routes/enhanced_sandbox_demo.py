@@ -609,57 +609,10 @@ for i in range(10):
 
                     <!-- 실행 컨트롤 -->
                     <div class="execution-controls">
-                        <button id="executeBtn" class="btn btn-primary" onclick="
-                            console.log('실행 버튼 클릭!');
-                            const codeEditor = document.getElementById('codeEditor');
-                            const resultSection = document.getElementById('resultSection');
-                            if (!codeEditor || !resultSection) {
-                                alert('DOM 요소를 찾을 수 없습니다!');
-                                return;
-                            }
-                            const code = codeEditor.value.trim();
-                            if (!code) {
-                                alert('실행할 코드를 입력해주세요!');
-                                return;
-                            }
-                            resultSection.textContent = '실행 중...';
-                            fetch('/api/v1/sandbox/execute', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    code: code,
-                                    language: 'python',
-                                    security_level: 'low',
-                                    user_id: 'demo_user'
-                                })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    resultSection.textContent = data.output;
-                                    resultSection.className = 'result-section result-success';
-                                } else {
-                                    resultSection.textContent = data.error || '실행 중 오류가 발생했습니다.';
-                                    resultSection.className = 'result-section result-error';
-                                }
-                            })
-                            .catch(error => {
-                                resultSection.textContent = '❌ 네트워크 오류: ' + error.message;
-                                resultSection.className = 'result-section result-error';
-                            });
-                        ">
+                        <button id="executeBtn" class="btn btn-primary" onclick="console.log('실행 버튼 클릭!'); alert('실행 버튼이 클릭되었습니다!');">
                             <span>▶️</span> 실행
                         </button>
-                        <button id="clearBtn" class="btn btn-secondary" onclick="
-                            console.log('지우기 버튼 클릭!');
-                            const codeEditor = document.getElementById('codeEditor');
-                            const resultSection = document.getElementById('resultSection');
-                            if (codeEditor) codeEditor.value = '';
-                            if (resultSection) {
-                                resultSection.textContent = '';
-                                resultSection.className = 'result-section';
-                            }
-                        ">
+                        <button id="clearBtn" class="btn btn-secondary" onclick="console.log('지우기 버튼 클릭!'); alert('지우기 버튼이 클릭되었습니다!');">
                             <span>🗑️</span> 지우기
                         </button>
                         <button id="saveBtn" class="btn btn-success">
