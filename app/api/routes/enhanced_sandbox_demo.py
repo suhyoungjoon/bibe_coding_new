@@ -629,7 +629,7 @@ for i in range(10):
                                 body: JSON.stringify({
                                     code: code,
                                     language: 'python',
-                                    security_level: 'LOW',
+                                    security_level: 'low',
                                     user_id: 'demo_user'
                                 })
                             })
