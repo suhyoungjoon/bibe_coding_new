@@ -622,13 +622,19 @@ for i in range(10):
                                 alert('실행할 코드를 입력해주세요!');
                                 return;
                             }
+                            
+                            // 현재 선택된 언어 확인
+                            const activeLangBtn = document.querySelector('.lang-btn.active');
+                            const language = activeLangBtn ? activeLangBtn.dataset.lang : 'python';
+                            console.log('선택된 언어:', language);
+                            
                             resultSection.textContent = '실행 중...';
                             fetch('/api/v1/sandbox/execute', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                     code: code,
-                                    language: 'python',
+                                    language: language,
                                     security_level: 'low',
                                     user_id: 'demo_user'
                                 })
